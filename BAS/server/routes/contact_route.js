@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const route = express.Router();
 const expressValidator = require('express-validator');
 const { expressionEmail, expressionMobile, expressionName } = require('../validation/RegularExpression');

@@ -28,7 +28,7 @@ exports.validateUser = async (request, response) => {
 
         if (error) {
           console.log(error);
-          return response.status(404).send({ msg: "error occured", error: error });
+          return response.status(402).send({ msg: "error occured", error: error });
         }
 
         if (result) {
@@ -43,7 +43,7 @@ exports.validateUser = async (request, response) => {
         }
         else {
           console.log(`Invalid password`);
-          return response.status(404).send({ msg: "Invalid password" });
+          return response.status(402).send({ msg: "Invalid password" });
         }
 
       });
@@ -67,7 +67,10 @@ exports.verifyUser = (request, response) => {
       }
       else {
         request.session.username = request.cookies.Email;
+        console.log("from verifyUser function : ", request.session.username);
+        
         response.cookie("Email", null, { expires: new Date(0) });
+
         return response.send(`Welcome to the home page : ${request.session.username}`);
       }
     });

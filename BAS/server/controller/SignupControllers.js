@@ -1,4 +1,4 @@
-const generateOTP = require("../OTP/GenerateOtp");
+const generateOTP = require("../RandomPINS/GenerateOtp");
 const sendEmail = require("../services/SendMailOTP");
 const checkConnection = require("../CheckConnections/CheckConnections");
 const mongoose = require("mongoose");
@@ -23,7 +23,7 @@ exports.validateUser = async (request, response) => {
   const newUserEmail = await UserSignupSchema.findOne({ Email: request.body.email });
 
   if (newUserEmail) {
-    response.status(404).send({ msg: `Email already exists` });
+    response.status(402).send({ msg: true });
     return;
   }
 
@@ -33,6 +33,7 @@ exports.validateUser = async (request, response) => {
 
   sendEmail(request, response, OTP);
   await mongoose.connection.close();
+
 };
 
 

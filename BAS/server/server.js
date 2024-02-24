@@ -3,6 +3,7 @@ const cors = require('cors');
 const mail = require("./services/SendMailOTP");
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
+const bodyParser = require('body-parser');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -12,6 +13,7 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({ secret: 'BMS', resave: false, saveUninitialized: true }));
+app.use(bodyParser.json());
 
 app.get("/", (request, response) => {
   response.status(200).send({ msg: "Hello from express" });
@@ -21,8 +23,9 @@ app.get("/", (request, response) => {
 
 app.use("/test/api/users", require("./routes/signup_route"));
 app.use("/test/api/users", require("./routes/login_route"));
-// app.use("/test/api/users", require("./routes/accountopen_route"));
 app.use("/test/api/users", require("./routes/contact_route"));
+
+app.use("/test/api/users", require("./routes/accountopen_route"));
 
 
 
@@ -32,4 +35,3 @@ app.listen(PORT, () => {
 
 
 
-/* Commit piyush and samarth  sui ja piyush */

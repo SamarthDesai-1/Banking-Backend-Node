@@ -5,20 +5,16 @@ const mongoose = require("mongoose");
 */
 
 let schema = new mongoose.Schema({
-  Customer_id: {
-    type: String,
-    required: true,
-    unique: true
+  _id: {
+    type: mongoose.Schema.Types.ObjectId,
+    default: mongoose.Types.ObjectId,
+    unique: true,
   },
   FirstName: {
     type: String,
     required: true
   },
   LastName: {
-    type: String,
-    required: true
-  },
-  Currency: {
     type: String,
     required: true
   },
@@ -30,22 +26,41 @@ let schema = new mongoose.Schema({
     type: String,
     required: true
   },
-  Email: {
+  PanCard: {
     type: String,
     required: true,
     unique: true
   },
-  State: {
+  AadharCard: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  Photo: {
     type: String,
     required: true
   },
-  City: {
+  Nominee: {
     type: String,
     required: true
   },
   Address: {
     type: String,
     required: true
+  },
+  MonthlyIncome: {
+    type: Number,
+    required: true
+  },
+  IFSC: {
+    type: String,
+  },
+  MICR: {
+    type: String,
+  },
+  Email: {
+    type: String,
+    unique: true,
   }
 });
 
