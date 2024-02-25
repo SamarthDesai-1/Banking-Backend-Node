@@ -4,8 +4,8 @@ const GenerateIFSC = require("../RandomPINS/GenerateIfsc");
 const GenerateMICR = require("../RandomPINS/GenerateMicr");
 
 
-exports.openAccount = async (request, response) => {
 
+exports.openAccount = async (request, response) => {
   const UserSignupSchema = require("../model/SignupDB");
   let Database = "Signup_Database";
   await mongoose.connection.close();
@@ -19,9 +19,10 @@ exports.openAccount = async (request, response) => {
     await mongoose.connection.close();
     await checkConnection(Database);
 
-    console.log(data);
     console.log("Account Number : ", data[0]._id);
     const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
+
+    console.log("Request After data : ", request);
 
     const newAccountUser = new UserAccountOpenSchema({
       _id: secondDocumentId, /* Account Number */
@@ -31,17 +32,19 @@ exports.openAccount = async (request, response) => {
       Mobile: request.body.mobile,
       PanCard: request.body.pancard,
       AadharCard: request.body.aadharcard,
-      Photo: request.body.photo,
+      Photo: request.file.path,
       Nominee: request.body.nominee,
+      NomineeAadharCard: request.body.nomineeaadharcard,
       Address: request.body.address,
       MonthlyIncome: request.body.income,
       IFSC: GenerateIFSC(),
       MICR: GenerateMICR(),
-      Email: request.session.username
+      Email: request.session.username,
+      DOB: request.body.dob
     });
 
     /* Save user in database */
-    await newAccountUser.save().then(data => console.log(data)).catch(() => console.log("User already exists"));
+    await newAccountUser.save().then(data => console.log(data)).catch((e) => console.log("User account is already open"));
     await mongoose.connection.close();
 
   }).catch(e => console.log(e));
@@ -60,12 +63,32 @@ exports.accountExists = async (request, response) => {
   await checkConnection(Database);
   console.log("account exists : ", request.session.username);
   await UserAccountOpenSchema.find({ Email: request.session.username }).then(async data => {
-    let boolean = data.length == 1 ? true : false;
+    let boolean = data.length == 1 ? true : false; /* if true from server navigate to enter PIN page to access dashboard else if false navigate to accountopen page */
     console.log(boolean);
 
     await mongoose.connection.close();
-    
+
     return response.status(200).send({ isExistsAccount: boolean });
   });
-  
+
+};
+
+
+exports.fetchCustomerData = async (request, response) => {
+
+  const UserAccountOpenSchema = require("../model/AccountOpenDB");
+  Database = "AccountOpen_Database";
+  await mongoose.connection.close();
+  await checkConnection(Database);
+
+  let boolean = false;
+
+  await UserAccountOpenSchema.find({ Email: request.session.username }).then(data => {
+
+    boolean = !boolean;
+    return response.status(200).send({ Data: data, dataFetchStatus: boolean });
+
+  }).catch(() => console.log("Error"));
+  await mongoose.connection.close();
+
 };

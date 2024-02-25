@@ -81,14 +81,15 @@ exports.verifyUser = (request, response) => {
 };
 
 exports.forgetPassword = async (request, response) => {
+
   const UserSignupSchema = require("../model/SignupDB");
   const Database = "Signup_Database";
   await mongoose.connection.close();
   await checkConnection(Database);
-  const email = request.body.email;
-  const user = UserSignupSchema.find({ Email: email });
 
-  user.then(data => {
+  const email = request.body.email;
+  const user = await UserSignupSchema.find({ Email: email }).then(data => {
+    
     console.log(data);
     if (data.length == 1) {
       console.log("when data.length == 1");
@@ -110,6 +111,7 @@ exports.forgetPassword = async (request, response) => {
     }
 
   }).catch(error => {
+    console.log(error);
     return response.status(200).send({ success: true, msg: `${error.message} this email not exists` });
   });
   await mongoose.connection.close();

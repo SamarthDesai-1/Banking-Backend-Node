@@ -44,6 +44,11 @@ let schema = new mongoose.Schema({
     type: String,
     required: true
   },
+  NomineeAadharCard: {
+    type: String,
+    required: true,
+    unique: true
+  },
   Address: {
     type: String,
     required: true
@@ -61,11 +66,16 @@ let schema = new mongoose.Schema({
   Email: {
     type: String,
     unique: true,
+  },
+  DOB: {
+    type: String,
+    required: true
   }
 });
 
 
-let UserAccountOpenSchema = new mongoose.model("accountopenusers", schema);
+const UserAccountOpenSchema = new mongoose.model("accountopenusers", schema);
 
 module.exports = UserAccountOpenSchema;
+
 
