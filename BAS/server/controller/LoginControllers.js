@@ -109,8 +109,9 @@ exports.forgetPassword = async (request, response) => {
 
       update(randomString, data[0].Email);
 
-      sendMail(data[0].Email, response, randomString);
-      response.status(200).send({ msg: "Please check your indox of mail and reset your password" });
+      // sendMail(data[0].Email, response, randomString);
+      
+      return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
     }
     else {
       return response.status(402).send({ msg: "Not found email ID" });
