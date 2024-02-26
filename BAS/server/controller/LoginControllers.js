@@ -111,9 +111,6 @@ exports.forgetPassword = async (request, response) => {
 
       // sendMail(data[0].Email, response, randomString);
 
-      /* Random string is added */
-      /** Commit right now */
-
       return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
     }
     else {
