@@ -11,7 +11,7 @@ function getFileExtension(filename) {
 const upload = multer({
   storage: multer.diskStorage({
     destination: (request, file, callBack) => {
-      callBack(null, "./BAS//server/uploads")
+      callBack(null, "./BAS/server/uploads")
     },
     fileFilter: (request, file, callBack) => {
         
