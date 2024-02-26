@@ -94,7 +94,7 @@ exports.forgetPassword = async (request, response) => {
   await checkConnection(Database);
 
   const email = request.body.email;
-  const user = await UserSignupSchema.find({ Email: email }).then(data => {
+  const user = await UserSignupSchema.find({ Email: email }).then(async data => {
     
     console.log(data);
     if (data.length == 1) {
@@ -110,7 +110,7 @@ exports.forgetPassword = async (request, response) => {
       update(randomString, data[0].Email);
 
       sendMail(data[0].Email, response, randomString);
-      response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
+      response.status(200).send({ msg: "Please check your indox of mail and reset your password" });
     }
     else {
       return response.status(402).send({ msg: "Not found email ID" });
@@ -124,12 +124,19 @@ exports.forgetPassword = async (request, response) => {
 };
 
 exports.resetPassword = async (request, response) => {
+
   const UserSignupSchema = require("../model/SignupDB");
   const Database = "Signup_Database";
   await mongoose.connection.close();
   await checkConnection(Database);
+
   try {
-    const token = request.query.token;
+
+    const token = request.body.tokenString;
+    console.log("Reset password token : ", token);
+    
+    // const token = request.query.token;
+
     await UserSignupSchema.find({ Token: token }).then(async data => {
       if (data.length == 1) {
         const password = request.body.password;
@@ -142,10 +149,13 @@ exports.resetPassword = async (request, response) => {
 
         await UserSignupSchema.findByIdAndUpdate(data[0]._id, { $set: { Password: newPassword, Token: '' } }, { new: true });
 
+        await mongoose.connection.close();
+
         response.status(200).send({ success: true, msg: "User password has been reset", data: data });
       }
       else {
         response.status(402).send({ success: true, msg: "This link has been expires" });
+        await mongoose.connection.close();
       }
       await mongoose.connection.close();
     });

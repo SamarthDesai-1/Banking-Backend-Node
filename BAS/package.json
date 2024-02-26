@@ -4,7 +4,8 @@
   "description": "This application is develop for providing financial services.",
   "main": "server.js",
   "scripts": {
-    "test": "nodemon server.js"
+    "test": "nodemon server.js",
+    "dev": " cd server && nodemon server.js"
   },
   "type": "commonjs",
   "author": "Samarth Desai",
@@ -21,6 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.2",
     "nodemailer": "^6.9.9",
+    "nodemon": "^3.1.0",
     "randomstring": "^1.3.0"
   }
 }
