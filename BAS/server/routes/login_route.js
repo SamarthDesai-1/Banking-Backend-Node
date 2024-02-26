@@ -16,7 +16,7 @@ route.post("/login", controller.validateUser);
 
 route.post("/forget-password", controller.forgetPassword); 
 
-route.get("/reset-password", controller.resetPassword); 
+route.post("/reset-password", controller.resetPassword); 
 
 
 route.get("/profile", controller.verifyUser);

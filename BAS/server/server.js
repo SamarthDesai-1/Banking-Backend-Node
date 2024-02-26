@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/", (request, response) => {
-  response.status(200).send({ msg: "Hello from express" });
+  return response.status(200).send({ msg: "Hello from express" });
 });
 
 /* Connect to Mongo DB  */ 
