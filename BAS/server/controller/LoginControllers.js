@@ -113,12 +113,12 @@ exports.forgetPassword = async (request, response) => {
       response.status(200).send({ msg: "Please check your indox of mail and reset your password" });
     }
     else {
-      return response.status(200).send({ msg: "Not found email ID" });
+      return response.status(402).send({ msg: "Not found email ID" });
     }
 
   }).catch(error => {
     console.log(error);
-    return response.status(200).send({ success: true, msg: `${error.message} this email not exists` });
+    return response.status(402).send({ success: true, msg: `${error.message} this email not exists` });
   });
   await mongoose.connection.close();
 };
@@ -145,13 +145,14 @@ exports.resetPassword = async (request, response) => {
         response.status(200).send({ success: true, msg: "User password has been reset", data: data });
       }
       else {
-        response.status(200).send({ success: true, msg: "This link has been expires" });
+        response.status(402).send({ success: true, msg: "This link has been expires" });
       }
       await mongoose.connection.close();
     });
   }
   catch (error) {
-    return response.status(200).send({ msg: error.message });
+    return response.status(402).send({ msg: error.message });
   }
 
 };
+
