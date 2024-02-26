@@ -36,10 +36,14 @@ exports.validateUser = async (request, response) => {
 
           const token = generateToken(request);
           response.setHeader('Authorization', `Bearer ${token}`);
+
           response.cookie("Name", token);
           response.cookie("Email", request.body.email);
 
-          return response.status(200).send({ msg: "Cookie set successfully", Token: token });
+          // request.session.username = request.cookies.Email;
+          // console.log("Login Email : ", request.session.username);
+
+          return response.status(200).send({ msg: "Cookie set successfully", Token: token, Email: request.body.email });
         }
         else {
           console.log(`Invalid password`);
@@ -55,9 +59,11 @@ exports.validateUser = async (request, response) => {
   await mongoose.connection.close();
 };
 
+/* Just build for demo to authenticate user token with JWT.verify for testing purpose to HOME page */
 exports.verifyUser = (request, response) => {
+
   const cookieValue = request.cookies.Name;
-  console.log(cookieValue);
+  console.log("Cookie value : ", cookieValue);
 
   try {
     JWT.verify(cookieValue, key, (error, decode) => {
@@ -66,12 +72,12 @@ exports.verifyUser = (request, response) => {
         return response.status(401).send({ error: "Unauthorized: Invalid token" });
       }
       else {
+
         request.session.username = request.cookies.Email;
         console.log("from verifyUser function : ", request.session.username);
-        
         response.cookie("Email", null, { expires: new Date(0) });
 
-        return response.send(`Welcome to the home page : ${request.session.username}`);
+        return response.send({  msg: `Welcome to the home page : ${request.session.username}`, Session: request.session.username });
       }
     });
   } catch (error) {

@@ -12,7 +12,6 @@ exports.openAccount = async (request, response) => {
   await checkConnection(Database);
 
   const userData = await UserSignupSchema.find({ Email: request.session.username }).then(async data => {
-    console.log(data);
 
     const UserAccountOpenSchema = require("../model/AccountOpenDB");
     Database = "AccountOpen_Database";
@@ -21,8 +20,6 @@ exports.openAccount = async (request, response) => {
 
     console.log("Account Number : ", data[0]._id);
     const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
-
-    console.log("Request After data : ", request);
 
     const newAccountUser = new UserAccountOpenSchema({
       _id: secondDocumentId, /* Account Number */

@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const mail = require("./services/SendMailOTP");
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -33,6 +32,3 @@ app.use("/test/api/users", require("./routes/accountopen_route"));
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);
 });
-
-
-
