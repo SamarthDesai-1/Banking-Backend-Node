@@ -6,12 +6,11 @@ const verifyToken = async (token, key) => {
 
   JWT.verify(token, key, async (error, decode) => {
     
-    if (error) {
+    if (error) 
       return boolean;
-    }
-    else {
+    
+    else 
       return !boolean;
-    }
 
   });
 

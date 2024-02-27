@@ -98,10 +98,8 @@ exports.forgetPassword = async (request, response) => {
 
   /* Token verfication is remaining on all API's first test token in this API */
 
-  const sessionEmail = request.body.sessionEmail;
   const sessionToken = request.body.sessionToken;
 
-  console.log(`Session email access on backend : ${sessionEmail}`);
   console.log(`Session token access on backend : ${sessionToken}`);
 
   const UserSignupSchema = require("../model/SignupDB");
@@ -117,47 +115,36 @@ exports.forgetPassword = async (request, response) => {
     if (data.length == 1) {
       console.log("when data.length == 1");
 
-      console.log(email, "  ", sessionEmail);
-      console.log(typeof email, "  ", typeof sessionEmail);
+      console.log("verify token execute soon");
+      const isValid = verifyToken(sessionToken, key);
+    
+      if (isValid) {
+        console.log("if statement execute");
+        const randomString = randomstring.generate();
 
-      if (email === sessionEmail) {
+        const update = async (randomString, email) => {
+          await UserSignupSchema.updateOne({ Email: email }, { $set: { Token: randomString } });
 
-        console.log("verify token execute soon");
-        const isValid = verifyToken(sessionToken, key);
-      
-        if (isValid) {
-          console.log("if statement execute");
-
-          const randomString = randomstring.generate();
-  
-          const update = async (randomString, email) => {
-            await UserSignupSchema.updateOne({ Email: email }, { $set: { Token: randomString } });
-  
-            console.log(`data updated successfully`);
-          }
-  
-          await update(randomString, data[0].Email);
-  
-          OBJ.OTP = generateOTP(6);
-  
-          /* Expiry time of OTP */
-          setTimeout(() => {
-  
-            OBJ.OTP = undefined;
-            console.log("Settimeout is executed");
-  
-          }, 60 * 2 * 1000);
-  
-          await sendMail(data[0].Email, response, randomString, OBJ.OTP);
-  
-          return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
+          console.log(`data updated successfully`);
         }
 
-        return response.status(402).send({ msg: "Token is invalid kindly login for further activities" });
-       
-      }
+        await update(randomString, data[0].Email);
 
-      return response.status(402).send({ msg: `You can only valid to change password of your ${sessionEmail} account only.`, Access: true });
+        OBJ.OTP = generateOTP(6);
+
+        /* Expiry time of OTP */
+        setTimeout(() => {
+
+          OBJ.OTP = undefined;
+          console.log("Settimeout is executed");
+
+        }, 60 * 2 * 1000);
+
+        await sendMail(data[0].Email, response, randomString, OBJ.OTP);
+
+        return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
+      
+      }
 
     }
     else {
