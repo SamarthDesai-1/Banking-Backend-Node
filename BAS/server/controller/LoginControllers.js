@@ -5,6 +5,7 @@ const sendMail = require("../services/SendMailResetPassword");
 const checkConnection = require("../CheckConnections/CheckConnections");
 const mongoose = require("mongoose");
 const generateOTP = require("../RandomPINS/GenerateOtp");
+const verifyToken = require("../Token/VerifyToken");
 
 const key = "secretkey";
 
@@ -121,30 +122,39 @@ exports.forgetPassword = async (request, response) => {
 
       if (email === sessionEmail) {
 
-        console.log("if statement execute");
+        console.log("verify token execute soon");
+        const isValid = verifyToken(sessionToken, key);
+      
+        if (isValid) {
+          console.log("if statement execute");
 
-        const randomString = randomstring.generate();
-
-        const update = async (randomString, email) => {
-          await UserSignupSchema.updateOne({ Email: email }, { $set: { Token: randomString } });
-
-          console.log(`data updated successfully`);
+          const randomString = randomstring.generate();
+  
+          const update = async (randomString, email) => {
+            await UserSignupSchema.updateOne({ Email: email }, { $set: { Token: randomString } });
+  
+            console.log(`data updated successfully`);
+          }
+  
+          await update(randomString, data[0].Email);
+  
+          OBJ.OTP = generateOTP(6);
+  
+          /* Expiry time of OTP */
+          setTimeout(() => {
+  
+            OBJ.OTP = undefined;
+            console.log("Settimeout is executed");
+  
+          }, 60 * 2 * 1000);
+  
+          await sendMail(data[0].Email, response, randomString, OBJ.OTP);
+  
+          return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
         }
 
-        await update(randomString, data[0].Email);
-
-        OBJ.OTP = generateOTP(6);
-
-        setTimeout(() => {
-
-          OBJ.OTP = undefined;
-          console.log("Settimeout is executed");
-
-        }, 60 * 2 * 1000);
-
-        await sendMail(data[0].Email, response, randomString, OBJ.OTP);
-
-        return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
+        return response.status(402).send({ msg: "Token is invalid kindly login for further activities" });
+       
       }
 
       return response.status(402).send({ msg: `You can only valid to change password of your ${sessionEmail} account only.`, Access: true });
