@@ -4,15 +4,20 @@ const randomstring = require('randomstring');
 const sendMail = require("../services/SendMailResetPassword");
 const checkConnection = require("../CheckConnections/CheckConnections");
 const mongoose = require("mongoose");
+const generateOTP = require("../RandomPINS/GenerateOtp");
 
 const key = "secretkey";
+
+const OBJ = {
+  OTP: undefined
+};
 
 function generateToken(request) {
   const userOBJ = {
     email: request.body.email,
     password: request.body.password
   };
-  
+
   return JWT.sign({ userOBJ }, key);
 }
 
@@ -77,16 +82,26 @@ exports.verifyUser = (request, response) => {
         console.log("from verifyUser function : ", request.session.username);
         response.cookie("Email", null, { expires: new Date(0) });
 
-        return response.send({  msg: `Welcome to the home page : ${request.session.username}`, Session: request.session.username });
+        return response.send({ msg: `Welcome to the home page : ${request.session.username}`, Session: request.session.username });
       }
     });
   } catch (error) {
     return response.status(401).send({ error: "Please authenticate a valid token" });
   }
-  
+
 };
 
 exports.forgetPassword = async (request, response) => {
+
+  /* Access session value to update only password of session email no one else can update any other individuals passwords */
+
+  /* Token verfication is remaining on all API's first test token in this API */
+
+  const sessionEmail = request.body.sessionEmail;
+  const sessionToken = request.body.sessionToken;
+
+  console.log(`Session email access on backend : ${sessionEmail}`);
+  console.log(`Session token access on backend : ${sessionToken}`);
 
   const UserSignupSchema = require("../model/SignupDB");
   const Database = "Signup_Database";
@@ -95,35 +110,55 @@ exports.forgetPassword = async (request, response) => {
 
   const email = request.body.email;
   const user = await UserSignupSchema.find({ Email: email }).then(async data => {
-    
+
     console.log(data);
+
     if (data.length == 1) {
       console.log("when data.length == 1");
-      const randomString = randomstring.generate();
 
-      const update = async (randomString, email) => {
-        await UserSignupSchema.updateOne({ Email: email }, { $set: { Token: randomString } });
+      console.log(email, "  ", sessionEmail);
+      console.log(typeof email, "  ", typeof sessionEmail);
 
-        console.log(`data updated successfully`);
+      if (email === sessionEmail) {
+
+        console.log("if statement execute");
+
+        const randomString = randomstring.generate();
+
+        const update = async (randomString, email) => {
+          await UserSignupSchema.updateOne({ Email: email }, { $set: { Token: randomString } });
+
+          console.log(`data updated successfully`);
+        }
+
+        await update(randomString, data[0].Email);
+
+        OBJ.OTP = generateOTP(6);
+
+        setTimeout(() => {
+
+          OBJ.OTP = undefined;
+          console.log("Settimeout is executed");
+
+        }, 60 * 2 * 1000);
+
+        await sendMail(data[0].Email, response, randomString, OBJ.OTP);
+
+        return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
       }
 
-      update(randomString, data[0].Email);
+      return response.status(402).send({ msg: `You can only valid to change password of your ${sessionEmail} account only.`, Access: true });
 
-      // sendMail(data[0].Email, response, randomString);
-
-      /* Random string is added */
-      /** Commit right now */
-
-      return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
     }
     else {
-      return response.status(402).send({ msg: "Not found email ID" });
+      return response.status(402).send({ msg: "Not found email ID", isMailFound: true });
     }
 
   }).catch(error => {
     console.log(error);
     return response.status(402).send({ success: true, msg: `${error.message} this email not exists` });
   });
+
   await mongoose.connection.close();
 };
 
@@ -138,8 +173,6 @@ exports.resetPassword = async (request, response) => {
 
     const token = request.body.tokenString;
     console.log("Reset password token : ", token);
-    
-    // const token = request.query.token;
 
     await UserSignupSchema.find({ Token: token }).then(async data => {
       if (data.length == 1) {
@@ -170,3 +203,18 @@ exports.resetPassword = async (request, response) => {
 
 };
 
+exports.otpPassword = async (request, response) => {
+
+  try {
+    console.log(`OTP from client ${request.body.otp}`, "  ",` OTP of server ${OBJ.OTP}`);
+  
+    if (request.body.otp === OBJ.OTP) {
+      return response.status(200).send({ msg: `OTP is authenticated successfully` });
+    }
+    return response.status(402).send({ msg: "Given OTP is unauthorized or expires time limit" });
+    
+  } catch (error) {
+    return response.status(402).send({ error: error });
+  }
+
+};  

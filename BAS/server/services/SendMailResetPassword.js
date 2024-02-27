@@ -1,9 +1,9 @@
 const nodemailer = require("nodemailer");
 
-const SendMail = async (email, response, token) => {
+const SendMail = async (email, response, token, OTP) => {
 
   console.log(`Email : ${email}`);
-  
+
   const transporter = nodemailer.createTransport({
     host: "smtp.forwardemail.net",
     port: 465,
@@ -20,8 +20,7 @@ const SendMail = async (email, response, token) => {
     // to: `${email}`,
     to: "samarthdesain@gmail.com",
     subject: "Hello from Transact LTD",
-    text: "Email for reset your password",
-    html: '<p>Hii samarthdesain@gmail.com , please copy the link <a href="https://localhost:5000/test/api/users/reset-password?token=' + token + '"> and reset your password</p>'
+    text: `Dear User,\n\nYou have requested to reset your password for your account with us. To proceed with the password reset process, please use the following OTP (One-Time Password) within the next 10 minutes:\n\nOTP: ${OTP}\n\nIf you did not initiate this password reset request, please disregard this email. Your account security may have been compromised, and we recommend contacting our support team immediately.\n\nThank you for using our service.\n\nBest regards,\nTransact Payments`,
   };
 
   try {
@@ -34,7 +33,7 @@ const SendMail = async (email, response, token) => {
       }
     });
     // return response.status(200).send({ msg: `Email send successfully to your ${request.body.email}` });
-    
+
   } catch (error) {
     response.status(404).send({ msg: "Not able to send Email" });
     return;

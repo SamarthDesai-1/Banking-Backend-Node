@@ -15,8 +15,8 @@ route.post("/login", controller.validateUser);
 
 
 route.post("/forget-password", controller.forgetPassword); 
-
 route.post("/reset-password", controller.resetPassword); 
+route.post("/reset-password-otp", controller.otpPassword); 
 
 
 route.get("/profile", controller.verifyUser);
