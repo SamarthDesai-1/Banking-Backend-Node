@@ -2,6 +2,8 @@ const express = require("express");
 const controller = require("../controller/AccountOpenController");
 const route = express.Router();
 const multer = require("multer");
+const verifyToken = require("../Token/VerifyToken");
+const path = require("path");
 
 
 function getFileExtension(filename) {
@@ -10,10 +12,14 @@ function getFileExtension(filename) {
 
 const upload = multer({
   storage: multer.diskStorage({
-    destination: (request, file, callBack) => {
-      callBack(null, "./BAS/server/uploads")
+    destination: async (request, file, callBack) => {
+      callBack(null, path.join(__dirname, "../uploads"))
+
+      const destinationPath = path.join(__dirname, "BAS/server/uploads");
+
+      console.log("Destination path : ", destinationPath);
     },
-    fileFilter: (request, file, callBack) => {
+    fileFilter: async (request, file, callBack) => {
         
         if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
         
@@ -21,15 +27,17 @@ const upload = multer({
         }
         callBack(null, true);
     },
-    filename: (request, file, callBack) => {
+    filename: async (request, file, callBack) => {
       const ext = getFileExtension(file.originalname);
+      console.log("\n");
+      console.log("Inside multer middleware : ", file.originalname);
       callBack(null, file.fieldname + "-" + Date.now() + "." + ext);
     }
   })
-}).single("user_image");
+});
 
-route.post("/open-account", upload, controller.openAccount);
-route.get("/account-exists", controller.accountExists);
+route.post("/open-account", upload.single('Photo'), controller.openAccount);
+route.post("/account-exists", verifyToken, controller.accountExists);
 route.get("/fetch-account-details", controller.fetchCustomerData);
 
 

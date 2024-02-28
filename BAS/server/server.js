@@ -3,6 +3,7 @@ const cors = require('cors');
 const cookieParser = require("cookie-parser");
 const session = require('express-session');
 const bodyParser = require('body-parser');
+require('dotenv').config({ path: "config.env" });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,7 +27,6 @@ app.use("/test/api/users", require("./routes/login_route"));
 app.use("/test/api/users", require("./routes/contact_route"));
 
 app.use("/test/api/users", require("./routes/accountopen_route"));
-
 
 
 app.listen(PORT, () => {

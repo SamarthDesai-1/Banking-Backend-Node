@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 const generateOTP = require("../RandomPINS/GenerateOtp");
 const verifyToken = require("../Token/VerifyToken");
 
-const key = "secretkey";
+const key = process.env.SECRET_KEY;
 
 const OBJ = {
   OTP: undefined
@@ -43,11 +43,14 @@ exports.validateUser = async (request, response) => {
           const token = generateToken(request);
           response.setHeader('Authorization', `Bearer ${token}`);
 
+
+          /* After complete testing API remove below both lines and all cookie variables */
           response.cookie("Name", token);
           response.cookie("Email", request.body.email);
 
-          // request.session.username = request.cookies.Email;
-          // console.log("Login Email : ", request.session.username);
+          /* Create user session */
+          request.session.username = request.body.email;
+          console.log("Login Email using session : ", request.session.username);
 
           return response.status(200).send({ msg: "Cookie set successfully", Token: token, Email: request.body.email });
         }
@@ -81,7 +84,7 @@ exports.verifyUser = (request, response) => {
 
         request.session.username = request.cookies.Email;
         console.log("from verifyUser function : ", request.session.username);
-        response.cookie("Email", null, { expires: new Date(0) });
+        // response.cookie("Email", null, { expires: new Date(0) });
 
         return response.send({ msg: `Welcome to the home page : ${request.session.username}`, Session: request.session.username });
       }
@@ -98,10 +101,6 @@ exports.forgetPassword = async (request, response) => {
 
   /* Token verfication is remaining on all API's first test token in this API */
 
-  const sessionToken = request.body.sessionToken;
-
-  console.log(`Session token access on backend : ${sessionToken}`);
-
   const UserSignupSchema = require("../model/SignupDB");
   const Database = "Signup_Database";
   await mongoose.connection.close();
@@ -115,37 +114,33 @@ exports.forgetPassword = async (request, response) => {
     if (data.length == 1) {
       console.log("when data.length == 1");
 
-      console.log("verify token execute soon");
-      const isValid = verifyToken(sessionToken, key);
+      console.log("verify token execute successfully");
     
-      if (isValid) {
-        console.log("if statement execute");
-        const randomString = randomstring.generate();
+      console.log("if statement execute");
+      const randomString = randomstring.generate();
 
-        const update = async (randomString, email) => {
-          await UserSignupSchema.updateOne({ Email: email }, { $set: { Token: randomString } });
+      const update = async (randomString, email) => {
+        await UserSignupSchema.updateOne({ Email: email }, { $set: { Token: randomString } });
 
-          console.log(`data updated successfully`);
-        }
-
-        await update(randomString, data[0].Email);
-
-        OBJ.OTP = generateOTP(6);
-
-        /* Expiry time of OTP */
-        setTimeout(() => {
-
-          OBJ.OTP = undefined;
-          console.log("Settimeout is executed");
-
-        }, 60 * 2 * 1000);
-
-        await sendMail(data[0].Email, response, randomString, OBJ.OTP);
-
-        return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
-      
+        console.log(`data updated successfully`);
       }
 
+      await update(randomString, data[0].Email);
+
+      OBJ.OTP = generateOTP(6);
+
+      /* Expiry time of OTP */
+      setTimeout(() => {
+
+        OBJ.OTP = undefined;
+        console.log("Settimeout is executed");
+
+      }, 60 * 2 * 1000);
+
+      await sendMail(data[0].Email, response, randomString, OBJ.OTP);
+
+      return response.status(200).send({ msg: "Please check your indox of mail and reset your password", RandomString: randomString });
+      
     }
     else {
       return response.status(402).send({ msg: "Not found email ID", isMailFound: true });

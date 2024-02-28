@@ -1,18 +1,36 @@
 const JWT = require("jsonwebtoken");
 
-const verifyToken = async (token, key) => {
 
-  const boolean = false;
+const verifyToken = async (request, response, next) => {
 
-  JWT.verify(token, key, async (error, decode) => {
-    
-    if (error) 
-      return boolean;
-    
-    else 
-      return !boolean;
+  let token = request.body.sessionToken;
+  console.log(request);
 
-  });
+  console.log("Token comming from frontend : ", token);
+
+  if (token) {
+    console.log("Token without bearer : ", token);
+
+    JWT.verify(token, process.env.SECRET_KEY, (error, valid) => {
+
+      if (error) {
+        response.status(402).send({ msg: "Please provide valid token with header" });
+      }
+      else {
+        next();
+      }
+
+    });
+
+    let x = process.env.SECRET_KEY;
+    console.log("PORT number from .ENV file : ", x);
+
+  }
+  else {
+    return response.status(402).send({ msg: "Please add token with header or kindly login to access My Account" });
+  }
+
+  console.log("Random token : ", token);
 
 };
 

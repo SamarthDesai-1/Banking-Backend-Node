@@ -4,8 +4,8 @@ const checkConnection = require("../CheckConnections/CheckConnections");
 const mongoose = require("mongoose");
 
 const OBJ = {
-  serverOTP: null,
-  SignupData: null
+  serverOTP: undefined,
+  SignupData: undefined
 };
 
 exports.validateUser = async (request, response) => {
@@ -30,6 +30,10 @@ exports.validateUser = async (request, response) => {
   const OTP = generateOTP(6);
   OBJ.SignupData = request.body;
   OBJ.serverOTP = OTP;
+
+  setTimeout(() => {
+    OBJ.serverOTP = null;
+  }, 60 * 2 * 1000);
 
   sendEmail(request, response, OTP);
   await mongoose.connection.close();
