@@ -109,3 +109,4 @@ exports.fetchCustomerData = async (request, response) => {
   await mongoose.connection.close();
 
 };
+

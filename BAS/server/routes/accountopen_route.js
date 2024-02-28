@@ -1,5 +1,5 @@
 const express = require("express");
-const controller = require("../controller/AccountOpenController");
+const controller = require("../controller/AccountOpenControllers");
 const route = express.Router();
 const multer = require("multer");
 const verifyToken = require("../Token/VerifyToken");
@@ -38,6 +38,7 @@ const upload = multer({
 
 route.post("/open-account", upload.single('Photo'), controller.openAccount);
 route.post("/account-exists", verifyToken, controller.accountExists);
+
 route.get("/fetch-account-details", controller.fetchCustomerData);
 
 

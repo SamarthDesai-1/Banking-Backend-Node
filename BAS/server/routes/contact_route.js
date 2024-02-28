@@ -2,7 +2,7 @@ const express = require("express");
 const route = express.Router();
 const expressValidator = require('express-validator');
 const { expressionEmail, expressionMobile, expressionName } = require('../validation/RegularExpression');
-const controller = require("../controller/ContactController");
+const controller = require("../controller/ContactControllers");
 
 const verifyArray = [
   expressValidator.body("name").isString().notEmpty().matches(/^[a-zA-Z ]{0,99}$/),

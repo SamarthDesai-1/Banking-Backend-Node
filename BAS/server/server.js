@@ -27,6 +27,7 @@ app.use("/test/api/users", require("./routes/login_route"));
 app.use("/test/api/users", require("./routes/contact_route"));
 
 app.use("/test/api/users", require("./routes/accountopen_route"));
+app.use("/test/api/users", require("./routes/customerfinancial_route"));
 
 
 app.listen(PORT, () => {

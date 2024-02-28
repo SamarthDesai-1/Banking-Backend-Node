@@ -1,24 +1,26 @@
 const mongoose = require("mongoose");
 
-let schema = new mongoose.Schema({
+const schema = new mongoose.Schema({ 
   _id: {
     type: mongoose.Schema.Types.ObjectId,
     default: mongoose.Types.ObjectId,
     unique: true,
   },
-  FirstName: {
+  Email: {
     type: String,
+    unique: true,
+  },
+  IFSC: {
+    type: String,
+  },
+  MICR: {
+    type: String,
+  },
+  MonthlyIncome: {
+    type: Number,
     required: true
   },
-  LastName: {
-    type: String,
-    required: true
-  },
-  AccountType: {
-    type: String,
-    required: true
-  },
-  Mobile: {
+  Photo: {
     type: String,
     required: true
   },
@@ -32,46 +34,41 @@ let schema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  Photo: {
+  FirstName: {
     type: String,
     required: true
   },
-  Nominee: {
+  LastName: {
     type: String,
     required: true
   },
-  NomineeAadharCard: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  Address: {
+  Mobile: {
     type: String,
     required: true
   },
-  MonthlyIncome: {
-    type: Number,
-    required: true
+
+  /** New database fields */
+
+  Balance: {
+    type: Number
   },
-  IFSC: {
-    type: String,
+  MinimumBalance: {
+    type: Number
   },
-  MICR: {
-    type: String,
+  Loan: {
+    type: String
   },
-  Email: {
-    type: String,
-    unique: true,
+  CreditCard: {
+    type: String
   },
-  DOB: {
-    type: String,
-    required: true
+  DebitCard: {
+    type: String
+  },
+  PIN: {
+    type: String
   }
 });
 
+const CustomerFinancialasData = new mongoose.model("customerfinancialasdata", schema);
 
-const UserAccountOpenSchema = new mongoose.model("accountopenusers", schema);
-
-module.exports = UserAccountOpenSchema;
-
-
+module.exports = CustomerFinancialasData;

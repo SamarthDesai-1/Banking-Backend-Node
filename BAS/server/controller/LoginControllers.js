@@ -5,7 +5,6 @@ const sendMail = require("../services/SendMailResetPassword");
 const checkConnection = require("../CheckConnections/CheckConnections");
 const mongoose = require("mongoose");
 const generateOTP = require("../RandomPINS/GenerateOtp");
-const verifyToken = require("../Token/VerifyToken");
 
 const key = process.env.SECRET_KEY;
 
