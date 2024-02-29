@@ -10,19 +10,21 @@ exports.openAccount = async (request, response) => {
   await mongoose.connection.close();
   await checkConnection(Database);
 
-  const userData = await UserSignupSchema.find({ Email: request.body.sessionEmail }).then(async data => {
+  try {
 
-    const UserAccountOpenSchema = require("../model/AccountOpenDB");
-    Database = "AccountOpen_Database";
-    await mongoose.connection.close();
-    await checkConnection(Database);
+    const userData = await UserSignupSchema.find({ Email: request.body.sessionEmail }).then(async data => {
+      
+      const UserAccountOpenSchema = require("../model/AccountOpenDB");
+      Database = "AccountOpen_Database";
+      await mongoose.connection.close();
+      await checkConnection(Database);
+      
+      console.log("Account Number : ", data[0]._id);
+      const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
+      
+      // console.log("Request object of create acccount : ", request);
 
-    console.log("Account Number : ", data[0]._id);
-    const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
-
-    // console.log("Request object of create acccount : ", request);
-
-    const newAccountUser = new UserAccountOpenSchema({
+      const newAccountUser = new UserAccountOpenSchema({
       _id: secondDocumentId, /* Account Number */
       FirstName: request.body.FirstName,
       LastName: request.body.LastName,
@@ -55,14 +57,20 @@ exports.openAccount = async (request, response) => {
       // MICR: GenerateMICR(),
       // Email: request.session.username,
       // DOB: request.body.dob
+      
+      
     });
-
+    
     /* Save user in database */
     await newAccountUser.save().then(data => console.log(data)).catch((e) => console.log("User account is already open", e));
     await mongoose.connection.close();
     return response.status(200).send({ msg: `Acoount open successfully : ${request.body.sessionEmai}` });
     
-  }).catch(e => console.log(e));
+    }).catch(e => console.log(e));
+  }
+  catch (error) {
+    return response.status(402).send({ msg: error });
+  }
   
   // await mongoose.connection.close();
   
