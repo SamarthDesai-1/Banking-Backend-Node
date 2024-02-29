@@ -9,12 +9,15 @@ const schema = new mongoose.Schema({
   Email: {
     type: String,
     unique: true,
+    required: true
   },
   IFSC: {
     type: String,
+    required: true
   },
   MICR: {
     type: String,
+    required: true
   },
   MonthlyIncome: {
     type: Number,
@@ -65,7 +68,8 @@ const schema = new mongoose.Schema({
     type: String
   },
   PIN: {
-    type: String
+    type: String,
+    unique: true
   }
 });
 
