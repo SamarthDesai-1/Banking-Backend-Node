@@ -13,11 +13,11 @@ function getFileExtension(filename) {
 const upload = multer({
   storage: multer.diskStorage({
     destination: async (request, file, callBack) => {
-      callBack(null, path.join(__dirname, "../uploads"))
 
-      const destinationPath = path.join(__dirname, "BAS/server/uploads");
+      // callBack(null, path.join(__dirname, "./uploads"))
+      // const destinationPath = path.join(__dirname, "BAS/server/uploads");
 
-      console.log("Destination path : ", destinationPath);
+      callBack(null, "./uploads")
     },
     fileFilter: async (request, file, callBack) => {
         

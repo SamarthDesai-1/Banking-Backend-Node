@@ -4,7 +4,6 @@ const GenerateIFSC = require("../RandomPINS/GenerateIfsc");
 const GenerateMICR = require("../RandomPINS/GenerateMicr");
 
 
-
 exports.openAccount = async (request, response) => {
   const UserSignupSchema = require("../model/SignupDB");
   let Database = "Signup_Database";
@@ -61,13 +60,12 @@ exports.openAccount = async (request, response) => {
     /* Save user in database */
     await newAccountUser.save().then(data => console.log(data)).catch((e) => console.log("User account is already open", e));
     await mongoose.connection.close();
-
+    return response.status(200).send({ msg: `Acoount open successfully : ${request.body.sessionEmai}` });
+    
   }).catch(e => console.log(e));
-
+  
   // await mongoose.connection.close();
-
-  return response.status(200).send({ msg: `Acoount open successfully : ${request.body.sessionEmai}` });
-
+  
 };
 
 exports.accountExists = async (request, response) => {
