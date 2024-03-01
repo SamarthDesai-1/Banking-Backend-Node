@@ -29,14 +29,13 @@ const upload = multer({
     },
     filename: async (request, file, callBack) => {
       const ext = getFileExtension(file.originalname);
-      console.log("\n");
       console.log("Inside multer middleware : ", file.originalname);
       callBack(null, file.fieldname + "-" + Date.now() + "." + ext);
     }
   })
 });
 
-route.post("/open-account", upload.single('Photo'), controller.openAccount);
+route.post("/open-account", verifyToken, upload.single('Photo'), controller.openAccount);
 route.post("/account-exists", verifyToken, controller.accountExists);
 
 route.get("/fetch-account-details", controller.fetchCustomerData);

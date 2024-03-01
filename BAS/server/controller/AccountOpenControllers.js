@@ -66,8 +66,7 @@ exports.openAccount = async (request, response) => {
 
     }).catch((e) => {
 
-      console.log("User account is already open");
-      return response.status(402).send({ msg: "Fill form properly", error: e });
+      return response.status(402).send({ msg: "User account is already open", error: e });
 
     });
 

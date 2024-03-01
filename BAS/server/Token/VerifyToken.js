@@ -3,8 +3,10 @@ const JWT = require("jsonwebtoken");
 
 const verifyToken = async (request, response, next) => {
 
+
   let token = request.body.sessionToken;
-  console.log(request);
+  console.log("Request Body : ", request.body);
+  console.log("Request Body email : ", request.body.sessionEmail);
 
   console.log("Token comming from frontend : ", token);
 
