@@ -18,6 +18,9 @@ exports.customerFinancialData = async (request, response) => {
     await checkConnection(Database);
 
     console.log("Account Number : ", data[0]._id);
+
+    return response.status(200).send({ msg: "Customer finance", Data: data });
+
     // const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
     
     // const newCustomerFianacialData = new CustomerFinancialasData({ 

@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(session({ secret: 'BMS', resave: false, saveUninitialized: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use('/uploads', express.static('E:/Banking Application Backend/Banking-Backend-Node/BAS/server/uploads'));
+app.use('/uploads', express.static('E:/Banking Application Backend/Banking-Backend-Node/BAS/server'));
 
 app.get("/", (request, response) => {
   return response.status(200).send({ msg: "Hello from express" });

@@ -10,18 +10,37 @@ exports.openAccount = async (request, response) => {
   await mongoose.connection.close();
   await checkConnection(Database);
 
+  console.log("Request Body : ", request.body);
 
+  console.log(request.body);
+  console.log("............................................");
+  console.log(request.body.sessionEmail);
+  console.log("............................................");
   const userData = await UserSignupSchema.find({ Email: request.body.sessionEmail }).then(async data => {
+    
+    console.log("Data : ", data);
     
     const UserAccountOpenSchema = require("../model/AccountOpenDB");
     Database = "AccountOpen_Database";
     await mongoose.connection.close();
     await checkConnection(Database);
     
+    
+    console.log("--------------------------------");
+    // const {FirstName, LastName, AccountType, Mobile, PanCard, AadharCard, Nominee, NomineeAadharCard, Address ,MonthlyIncome, sessionEmail, DOB } =request.body
+    let Photo = request.file.path;
+    console.log("Image path : ", Photo);
+    // const eEmail = sessionEmail
+    // console.log(eEmail);
+    // const accountOpenn = new UserAccountOpenSchema({FirstName, LastName, AccountType, Mobile, PanCard, AadharCard, Photo, Nominee, NomineeAadharCard, Address ,MonthlyIncome,GenerateIFSC,GenerateMICR, eEmail, DOB})
+    
+    // const successsave = await accountOpenn.save();
+    
+    // console.log(successsave);
+    
     console.log("Account Number : ", data[0]._id);
     const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
     
-
     const newAccountUser = new UserAccountOpenSchema({
       _id: secondDocumentId, /* Account Number */
       FirstName: request.body.FirstName,
@@ -66,10 +85,11 @@ exports.openAccount = async (request, response) => {
 
     }).catch((e) => {
 
-      return response.status(402).send({ msg: "User account is already open", error: e });
+      return response.status(402).send({ error: e, msg: "Resolve the error fill the form properly." });
 
     });
 
+    
     await mongoose.connection.close();
 
     
