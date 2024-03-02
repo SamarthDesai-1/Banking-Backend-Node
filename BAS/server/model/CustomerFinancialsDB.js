@@ -75,3 +75,4 @@ const schema = new mongoose.Schema({
 const CustomerFinancialasData = new mongoose.model("customerfinancialasdata", schema);
 
 module.exports = CustomerFinancialasData;
+

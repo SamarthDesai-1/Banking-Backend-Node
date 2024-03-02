@@ -40,15 +40,57 @@ exports.customerFinancialData = async (request, response) => {
     await getAccountOpenData(request).then(async data => {
 
       console.log("Account open data : ", data);
+      console.log("PIN : ", request.body.PIN);
 
-      return response.status(200).send({ msg: "Success Ok" });
-    });
-  }
-  else if (request.body.PIN !== undefined && request.body.update) {
-    /** Update PIN code here */
+      /** Data insreted successfully */
+      await mongoose.connection.close();
+      const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
+      Database = "CustomerFinancials_Database";
+      await checkConnection(Database);
 
+      console.log("Account Number : ", data[0]._id);
+      const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
+
+      const newCustomerData = new CustomerFinancialasData({
+        _id: secondDocumentId,
+        Email: data[0].Email,
+        IFSC: data[0].IFSC,
+        MICR: data[0].MICR,
+        MonthlyIncome: data[0].MonthlyIncome,
+        Photo: data[0].Photo,
+        PanCard: data[0].PanCard,
+        AadharCard: data[0].AadharCard,
+        FirstName: data[0].FirstName,
+        LastName: data[0].LastName,
+        Mobile: data[0].Mobile,
+        PIN: request.body.PIN,
+        Balance: request.body.Balance === undefined ? 0 : request.body.Balance,
+        MinimumBalance: request.body.MinimumBalance === undefined ? 0 : request.body.MinimumBalance,
+        Loan: request.body.Loan === "" ? "null" :  request.body.Loan,
+        CreditCard: request.body.CreditCard === undefined ? "No issue" : request.body.CreditCard,
+        DebitCard: request.body.DebitCard === undefined ? "No issue" : request.body.DebitCard
+      });
+
+      /* Save user in database */
+      await newCustomerData.save().then(data => {
+
+        console.log(data);
+        return response.status(200).send({ msg: `Data inserted successfully in customer financial database : ${request.body.sessionEmai}` });
+
+      }).catch((e) => {
+
+        return response.status(402).send({ error: e, msg: "Resolve the error fill the form properly." });
+
+      });
+
+      await mongoose.connection.close();
+
+      // return response.status(200).send({ msg: "Success Ok" });
+
+    }).catch(e => console.log("Error : ", e));
   }
   else {
+    console.log("Customer financial data call");
     await mongoose.connection.close();
     const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
     Database = "CustomerFinancials_Database";
@@ -67,6 +109,10 @@ exports.customerFinancialData = async (request, response) => {
       console.log("Failed to fetch the data : false");
     }
   }
+   // else if (request.body.PIN !== undefined && request.body.update) {
+  //   /** Update PIN code here */
+
+  // }
 
   console.log("..................................................................");
   console.log(request.body);
