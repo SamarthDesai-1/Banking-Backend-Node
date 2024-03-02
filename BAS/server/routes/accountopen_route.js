@@ -32,7 +32,7 @@ const upload = multer({
   })
 });
 
-route.post("/open-account", upload.single('Photo'), controller.openAccount);
+route.post("/open-account", /* verifyToken */ upload.single('Photo'), controller.openAccount);
 route.post("/account-exists", verifyToken, controller.accountExists);
 
 route.get("/fetch-account-details", controller.fetchCustomerData);

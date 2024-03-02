@@ -51,7 +51,10 @@ const schema = new mongoose.Schema({
   },
 
   /** New database fields */
-
+  PIN: {
+    type: String,
+    unique: true
+  },
   Balance: {
     type: Number
   },
@@ -66,10 +69,6 @@ const schema = new mongoose.Schema({
   },
   DebitCard: {
     type: String
-  },
-  PIN: {
-    type: String,
-    unique: true
   }
 });
 

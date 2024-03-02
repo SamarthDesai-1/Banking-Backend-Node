@@ -30,6 +30,8 @@ app.use("/test/api/users", require("./routes/contact_route"));
 app.use("/test/api/users", require("./routes/accountopen_route"));
 app.use("/test/api/users", require("./routes/customerfinancial_route"));
 
+app.use("/test/api/users", require("./routes/pinVerify_route"));
+
 
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);

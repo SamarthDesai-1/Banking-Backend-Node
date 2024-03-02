@@ -3,6 +3,7 @@ const nodemailer = require("nodemailer");
 const SendMail = async (email, response, token, OTP) => {
 
   console.log(`Email : ${email}`);
+  console.log("OTP : ", OTP);
 
   const transporter = nodemailer.createTransport({
     host: "smtp.forwardemail.net",
@@ -42,3 +43,4 @@ const SendMail = async (email, response, token, OTP) => {
 };
 
 module.exports = SendMail;
+

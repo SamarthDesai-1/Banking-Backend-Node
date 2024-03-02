@@ -18,7 +18,7 @@ const SendMail = async (request, response, OTP) => {
     // to: `${request.body.email}`,
     to: "samarthdesain@gmail.com",
     subject: "Hello from Transact LTD",
-    text: `Do not share this OTP to anyone : ${OTP}`
+    text: `Do not share this OTP to anyone thanks for  : ${OTP}`
   };
 
   try {

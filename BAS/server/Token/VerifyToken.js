@@ -1,7 +1,6 @@
 const JWT = require("jsonwebtoken");
 
-
-const verifyToken = async (request, response, next) => {
+const verifyToken = (request, response, next) => {
 
   console.log(request.body);
 
@@ -13,7 +12,7 @@ const verifyToken = async (request, response, next) => {
 
   console.log("Token comming from frontend : ", token);
 
-  if (await token) {
+  if (token) {
     console.log("Token without bearer : ", token);
 
     JWT.verify(token, process.env.SECRET_KEY, (error, valid) => {
