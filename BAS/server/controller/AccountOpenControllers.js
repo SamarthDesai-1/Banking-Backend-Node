@@ -122,13 +122,13 @@ exports.fetchCustomerData = async (request, response) => {
 
   /** call Customer finance data API to fetch */
   await mongoose.connection.close();
-  const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
-  Database = "CustomerFinancials_Database";
+  const UserAccountOpenSchema = require("../model/AccountOpenDB");
+  Database = "AccountOpen_Database";
   await checkConnection(Database);
 
   let boolean = false;
 
-  await CustomerFinancialasData.find({ Email: request.body.sessionEmail }).then(data => {
+  await UserAccountOpenSchema.find({ Email: request.body.sessionEmail }).then(data => {
 
     boolean = !boolean;
     return response.status(200).send({ Data: data, dataFetchStatus: boolean });
