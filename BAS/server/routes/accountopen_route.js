@@ -35,7 +35,8 @@ const upload = multer({
 route.post("/open-account", /* verifyToken */ upload.single('Photo'), controller.openAccount);
 route.post("/account-exists", verifyToken, controller.accountExists);
 
-route.get("/fetch-account-details", controller.fetchCustomerData);
+route.post("/fetch-account-details", verifyToken, controller.fetchCustomerData);
+route.post("/update-account-details", controller.updateCustomerData);
 
 
 module.exports = route;

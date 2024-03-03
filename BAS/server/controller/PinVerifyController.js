@@ -37,8 +37,12 @@ exports.verifyPIN = async (request, response) => {
         } 
         else {
 
+          if (incrementOBJ.count < 3) {
+            incrementOBJ.count++;
+            return response.status(402).send({ msg: "OTP is invalid" });
+          }
+
           console.log("IN ELSE STATEMENT");
-          incrementOBJ.count++;
           console.log(incrementOBJ.count);
           if (incrementOBJ.count === incrementOBJ.tries) {
             console.log("Tries : ", incrementOBJ);
@@ -46,8 +50,8 @@ exports.verifyPIN = async (request, response) => {
             incrementOBJ.isExecute = false;
           
             setTimeout(() => {
-                console.log("set time out is executed after 2 min");
-                incrementOBJ.isExecute = true;
+              console.log("set time out is executed after 2 min");
+              incrementOBJ.isExecute = true;
             }, 120000);
 
             incrementOBJ.count = 0;

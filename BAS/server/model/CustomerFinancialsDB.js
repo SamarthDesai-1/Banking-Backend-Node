@@ -49,6 +49,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: true
   },
+  AccountType: {
+    type: String,
+    required: true
+  },
 
   /** New database fields */
   PIN: {

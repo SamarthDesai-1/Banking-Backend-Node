@@ -64,6 +64,7 @@ exports.customerFinancialData = async (request, response) => {
         LastName: data[0].LastName,
         Mobile: data[0].Mobile,
         PIN: request.body.PIN,
+        AccountType: data[0].AccountType,
         Balance: request.body.Balance === undefined ? 0 : request.body.Balance,
         MinimumBalance: request.body.MinimumBalance === undefined ? 0 : request.body.MinimumBalance,
         Loan: request.body.Loan === "" ? "null" :  request.body.Loan,
@@ -84,8 +85,6 @@ exports.customerFinancialData = async (request, response) => {
       });
 
       await mongoose.connection.close();
-
-      // return response.status(200).send({ msg: "Success Ok" });
 
     }).catch(e => console.log("Error : ", e));
   }

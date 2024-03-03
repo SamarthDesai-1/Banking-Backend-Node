@@ -120,14 +120,15 @@ exports.accountExists = async (request, response) => {
 
 exports.fetchCustomerData = async (request, response) => {
 
-  const UserAccountOpenSchema = require("../model/AccountOpenDB");
-  Database = "AccountOpen_Database";
+  /** call Customer finance data API to fetch */
   await mongoose.connection.close();
+  const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
+  Database = "CustomerFinancials_Database";
   await checkConnection(Database);
 
   let boolean = false;
 
-  await UserAccountOpenSchema.find({ Email: request.session.username }).then(data => {
+  await CustomerFinancialasData.find({ Email: request.body.sessionEmail }).then(data => {
 
     boolean = !boolean;
     return response.status(200).send({ Data: data, dataFetchStatus: boolean });
@@ -135,5 +136,68 @@ exports.fetchCustomerData = async (request, response) => {
   }).catch(() => console.log("Error"));
   await mongoose.connection.close();
 
+};
+
+
+exports.updateCustomerData = async (request, response) => {
+  
+  await mongoose.connection.close();
+  const UserAccountOpenSchema = require("../model/AccountOpenDB");
+  Database = "AccountOpen_Database";
+  await checkConnection(Database);
+
+  console.log(".................................................");
+  console.log("Request Body update account data : ", request.body);
+  console.log(".................................................");
+
+  console.log("FirstName : ", request.body.data.FirstName);
+  console.log("LastName : ", request.body.data.LastName);
+  console.log("DOB : ", request.body.data.DOB);
+  console.log("MonthlyIncome : ", typeof request.body.data.MonthlyIncome);
+
+  let income = Number.parseInt(request.body.data.MonthlyIncome);
+  console.log(income, "  ", typeof income);
+
+  console.log("Data : ", request.body.data);
+
+  /** update in account open schema */
+  await UserAccountOpenSchema.updateOne({ Email: request.body.sessionEmail }, { $set: { 
+    FirstName: request.body.data.FirstName,
+    LastName: request.body.data.LastName,
+    Address: request.body.data.Address,
+    DOB: request.body.data.DOB,
+    Mobile: request.body.data.Mobile,
+    MonthlyIncome: request.body.data.MonthlyIncome,
+    AadharCard: request.body.data.AadharCard,
+    Nominee: request.body.data.Nominee,
+    NomineeAadharCard: request.body.data.NomineeAadharCard,
+    PanCard: request.body.data.PanCard,
+
+  } }, { new: true });
+  await mongoose.connection.close();
+
+
+  /** customer bank details schema */
+  const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
+  Database = "CustomerFinancials_Database";
+  await checkConnection(Database);
+
+  await CustomerFinancialasData.updateOne({ Email: request.body.sessionEmail }, { $set: { 
+    FirstName: request.body.data.FirstName,
+    LastName: request.body.data.LastName,
+    Address: request.body.data.Address,
+    DOB: request.body.data.DOB,
+    Mobile: request.body.data.Mobile,
+    MonthlyIncome: request.body.data.MonthlyIncome,
+    AadharCard: request.body.data.AadharCard,
+    Nominee: request.body.data.Nominee,
+    NomineeAadharCard: request.body.data.NomineeAadharCard,
+    PanCard: request.body.data.PanCard,  
+
+  } }, { new: true });
+  await mongoose.connection.close();
+
+
+  return response.status(200).send({ msg: "Success ok TEST API" });
 };
 
