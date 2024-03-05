@@ -32,6 +32,12 @@ app.use("/test/api/users", require("./routes/customerfinancial_route"));
 
 app.use("/test/api/users", require("./routes/pinVerify_route"));
 
+app.use("/test/api/users", require("./routes/accountstatus_route"));
+
+app.use("/test/api/users", require("./routes/transferfunds_route"));
+
+app.use("/test/api/users", require("./routes/fetch_route"));
+
 
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);

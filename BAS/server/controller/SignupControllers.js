@@ -33,7 +33,8 @@ exports.validateUser = async (request, response) => {
 
   setTimeout(() => {
     OBJ.serverOTP = null;
-  }, 60 * 2 * 1000);
+    console.log("sestimeout is executed for signup registration API");
+  }, 60 * 3 * 1000);
 
   sendEmail(request, response, OTP);
   await mongoose.connection.close();

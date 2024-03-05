@@ -53,6 +53,10 @@ const schema = new mongoose.Schema({
     type: String,
     required: true
   },
+  DigitalSignature: {
+    type: String,
+    default: ""
+  },
 
   /** New database fields */
   PIN: {
@@ -73,6 +77,10 @@ const schema = new mongoose.Schema({
   },
   DebitCard: {
     type: String
+  },
+  AccountNo: {
+    type: String,
+    required: true
   }
 });
 

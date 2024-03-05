@@ -2,7 +2,13 @@ const checkConnection = require("../CheckConnections/CheckConnections");
 const mongoose = require("mongoose");
 const GenerateIFSC = require("../RandomPINS/GenerateIfsc");
 const GenerateMICR = require("../RandomPINS/GenerateMicr");
+const randomstring = require('randomstring');
+const GenerateAccountNo = require("../RandomPINS/AccountNo");
 
+const OBJ = {
+  randomString: undefined,
+  AccountNo: undefined
+};
 
 exports.openAccount = async (request, response) => {
   const UserSignupSchema = require("../model/SignupDB");
@@ -12,7 +18,6 @@ exports.openAccount = async (request, response) => {
 
   console.log("Request Body : ", request.body);
 
-  console.log(request.body);
   console.log("............................................");
   console.log(request.body.sessionEmail);
   console.log("............................................");
@@ -29,6 +34,7 @@ exports.openAccount = async (request, response) => {
     console.log("--------------------------------");
     // const {FirstName, LastName, AccountType, Mobile, PanCard, AadharCard, Nominee, NomineeAadharCard, Address ,MonthlyIncome, sessionEmail, DOB } =request.body
     let Photo = request.file.path;
+    console.log("Request file : ", request.file);
     console.log("Image path : ", Photo);
     // const eEmail = sessionEmail
     // console.log(eEmail);
@@ -40,6 +46,12 @@ exports.openAccount = async (request, response) => {
     
     console.log("Account Number : ", data[0]._id);
     const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
+
+    const randomString = randomstring.generate();
+    OBJ.randomString = randomString;
+    console.log("Random string digital signature : ", randomString);
+
+    OBJ.AccountNo = GenerateAccountNo();
     
     const newAccountUser = new UserAccountOpenSchema({
       _id: secondDocumentId, /* Account Number */
@@ -57,7 +69,10 @@ exports.openAccount = async (request, response) => {
       IFSC: GenerateIFSC(),
       MICR: GenerateMICR(),
       Email: request.body.sessionEmail,
-      DOB: request.body.DOB
+      DOB: request.body.DOB,
+      DigitalSignature: randomString,
+      AccountNo: OBJ.AccountNo,
+      Date: Date.now()
 
       // FirstName: request.body.fname,
       // LastName: request.body.lname,
@@ -78,9 +93,25 @@ exports.openAccount = async (request, response) => {
   });
   
     /* Save user in database */
-    await newAccountUser.save().then(data => {
+    await newAccountUser.save().then(async data => {
 
       console.log(data);
+
+      /** save token in seperate server database */
+      await mongoose.connection.close();
+      const TokenSchema = require("../model/TokenDB");
+      Database = "Token_DB";
+      await checkConnection(Database);
+
+      const newToken = new TokenSchema({ 
+        _id: secondDocumentId,
+        Email: request.body.sessionEmail,
+        Randomstring: randomString,
+        AccountNo: OBJ.AccountNo
+      });
+
+      await newToken.save().then(data => console.log(data));
+
       return response.status(200).send({ msg: `Acoount open successfully : ${request.body.sessionEmai}` });
 
     }).catch((e) => {
@@ -200,4 +231,3 @@ exports.updateCustomerData = async (request, response) => {
 
   return response.status(200).send({ msg: "Success ok TEST API" });
 };
-

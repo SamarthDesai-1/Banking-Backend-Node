@@ -69,24 +69,35 @@ exports.customerFinancialData = async (request, response) => {
         MinimumBalance: request.body.MinimumBalance === undefined ? 0 : request.body.MinimumBalance,
         Loan: request.body.Loan === "" ? "null" :  request.body.Loan,
         CreditCard: request.body.CreditCard === undefined ? "No issue" : request.body.CreditCard,
-        DebitCard: request.body.DebitCard === undefined ? "No issue" : request.body.DebitCard
+        DebitCard: request.body.DebitCard === undefined ? "No issue" : request.body.DebitCard,
+        DigitalSignature: data[0].DigitalSignature,
+        AccountNo: data[0].AccountNo
       });
 
       /* Save user in database */
-      await newCustomerData.save().then(data => {
+      await newCustomerData.save().then(async data => console.log(data));
 
-        console.log(data);
-        return response.status(200).send({ msg: `Data inserted successfully in customer financial database : ${request.body.sessionEmai}` });
+      /** establish AccountStatus Schema insert data in databsse  */
+      await mongoose.connection.close();
+      const AccountStatusSchema = require("../model/AccountStatusDB");
+      Database = "AccountStatus_Database";
+      await checkConnection(Database);
 
-      }).catch((e) => {
-
-        return response.status(402).send({ error: e, msg: "Resolve the error fill the form properly." });
-
+      const NewData = new AccountStatusSchema({
+        _id: secondDocumentId,
+        Email: data[0].Email,
+        DigitalSignature: data[0].DigitalSignature,
+        AccountNo: data[0].AccountNo
       });
 
+      await NewData.save().then(data => console.log("Account status data : ", data)).catch(e => console.log("Error from account status Database : ", e));
       await mongoose.connection.close();
 
+      return response.status(200).send({ msg: `Data inserted successfully in customer financial database and account ststus database : ${request.body.sessionEmai}` });
+
+
     }).catch(e => console.log("Error : ", e));
+
   }
   else {
     console.log("Customer financial data call");
@@ -108,14 +119,11 @@ exports.customerFinancialData = async (request, response) => {
       console.log("Failed to fetch the data : false");
     }
   }
-   // else if (request.body.PIN !== undefined && request.body.update) {
-  //   /** Update PIN code here */
-
-  // }
 
   console.log("..................................................................");
   console.log(request.body);
   console.log("..................................................................");
 
 };
+
 

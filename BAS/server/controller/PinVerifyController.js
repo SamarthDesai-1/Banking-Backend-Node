@@ -69,7 +69,7 @@ exports.verifyPIN = async (request, response) => {
   
   }
   else {
-    return response.status(402).send({ msg: "You are not authorized user access account after one hour" });
+    return response.status(402).send({ msg: "You are not authorized user access account after one minute" });
   }
 
   await mongoose.connection.close();
@@ -98,7 +98,7 @@ exports.forgetPIN = async (request, response) => {
         OBJ.OTP = undefined;
         console.log("Settimeout is executed for forget PIN");
 
-      }, 60 * 2 * 1000);
+      }, 60 * 3 * 1000);
 
       await sendMail(data[0].Email, response, "", OBJ.OTP);
 

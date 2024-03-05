@@ -66,6 +66,18 @@ let schema = new mongoose.Schema({
   DOB: {
     type: String,
     required: true
+  },
+  DigitalSignature: {
+    type: String,
+    default: ""
+  },
+  AccountNo: {
+    type: String,
+    required: true
+  },
+  Date: {
+    type: Date,
+    required: true
   }
 });
 

@@ -134,7 +134,7 @@ exports.forgetPassword = async (request, response) => {
         OBJ.OTP = undefined;
         console.log("Settimeout is executed");
 
-      }, 60 * 2 * 1000);
+      }, 60 * 3 * 1000);
 
       await sendMail(data[0].Email, response, randomString, OBJ.OTP);
 
@@ -209,5 +209,6 @@ exports.otpPassword = async (request, response) => {
   }
 
 };  
+
 
 
