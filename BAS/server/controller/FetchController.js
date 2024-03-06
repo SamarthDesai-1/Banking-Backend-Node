@@ -3,12 +3,13 @@ const checkConnection = require("../CheckConnections/CheckConnections");
 
 exports.fetchUser = async (request, response) => {
 
+  // await mongoose.connection.close();
+  
   const { sessionEmail } = request.body;
   let data = undefined;
 
   try {
     
-    await mongoose.connection.close();
     const AccountStatusSchema = require("../model/AccountStatusDB");
     let Database = "AccountStatus_Database";
     await checkConnection(Database);

@@ -192,6 +192,10 @@ exports.withdrawFunds = async (request, response) => {
             };
             OBJ.Amount = await computeFunds(amount, data[0].Balance);
             console.log("OBJ amount : ", OBJ.Amount);
+
+            if (OBJ.Amount <= 1500) {
+              return response.status(402).send({ msg: "You cannot withdraw more money minimum balance should have to maintain" });
+            }
     
             await AccountStatusSchema.updateOne({ _id: data[0]._id }, { $set: { Balance: OBJ.Amount } }, { new: true });
             OBJ.isExecutedForWITHDRAWFUNDS = true;
@@ -202,7 +206,7 @@ exports.withdrawFunds = async (request, response) => {
         }
       }
       else {
-        return response.status(402).send({ msg: "Retype OTP is invalid" });
+        return response.status(402).send({ msg: "Retype PIN is invalid" });
       }
       
      

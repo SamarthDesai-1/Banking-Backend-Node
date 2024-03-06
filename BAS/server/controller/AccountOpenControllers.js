@@ -31,18 +31,9 @@ exports.openAccount = async (request, response) => {
     await checkConnection(Database);
     
     
-    console.log("--------------------------------");
-    // const {FirstName, LastName, AccountType, Mobile, PanCard, AadharCard, Nominee, NomineeAadharCard, Address ,MonthlyIncome, sessionEmail, DOB } =request.body
     let Photo = request.file.path;
     console.log("Request file : ", request.file);
     console.log("Image path : ", Photo);
-    // const eEmail = sessionEmail
-    // console.log(eEmail);
-    // const accountOpenn = new UserAccountOpenSchema({FirstName, LastName, AccountType, Mobile, PanCard, AadharCard, Photo, Nominee, NomineeAadharCard, Address ,MonthlyIncome,GenerateIFSC,GenerateMICR, eEmail, DOB})
-    
-    // const successsave = await accountOpenn.save();
-    
-    // console.log(successsave);
     
     console.log("Account Number : ", data[0]._id);
     const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
@@ -73,24 +64,8 @@ exports.openAccount = async (request, response) => {
       DigitalSignature: randomString,
       AccountNo: OBJ.AccountNo,
       Date: Date.now()
-
-      // FirstName: request.body.fname,
-      // LastName: request.body.lname,
-      // AccountType: request.body.accounttype,
-      // Mobile: request.body.mobile,
-      // PanCard: request.body.pancard,
-      // AadharCard: request.body.aadharcard,
-      // Photo: request.file.path,
-      // Nominee: request.body.nominee,
-      // NomineeAadharCard: request.body.nomineeaadharcard,
-      // Address: request.body.address,
-      // MonthlyIncome: request.body.income,
-      // IFSC: GenerateIFSC(),
-      // MICR: GenerateMICR(),
-      // Email: request.session.username,
-      // DOB: request.body.dob
   
-  });
+    });
   
     /* Save user in database */
     await newAccountUser.save().then(async data => {
@@ -152,20 +127,22 @@ exports.accountExists = async (request, response) => {
 exports.fetchCustomerData = async (request, response) => {
 
   /** call Customer finance data API to fetch */
+
   await mongoose.connection.close();
   const UserAccountOpenSchema = require("../model/AccountOpenDB");
   Database = "AccountOpen_Database";
   await checkConnection(Database);
 
   let boolean = false;
+  console.log("Email : ", request.body.sessionEmail);
 
-  await UserAccountOpenSchema.find({ Email: request.body.sessionEmail }).then(data => {
+  await UserAccountOpenSchema.find({ Email: request.body.sessionEmail }).then(async data => {
 
     boolean = !boolean;
+    await mongoose.connection.close();
     return response.status(200).send({ Data: data, dataFetchStatus: boolean });
 
-  }).catch(() => console.log("Error"));
-  await mongoose.connection.close();
+  }).catch((e) => console.log("Error : ", e));
 
 };
 

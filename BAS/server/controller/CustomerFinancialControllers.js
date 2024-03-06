@@ -14,9 +14,9 @@ const getAccountOpenData = async (request) => {
   await checkConnection(Database);
   try {
     const data = await UserAccountOpenSchema.find({ Email: request.body.sessionEmail });
+    await mongoose.connection.close();
 
     if (data) {
-      await mongoose.connection.close();
       return data; 
     }
     else {
@@ -25,13 +25,17 @@ const getAccountOpenData = async (request) => {
     }
   }
   catch(e) {
-    await mongoose.connection.close();
     console.log("Error : ", e);
   }
   return null;
 }
 
 exports.customerFinancialData = async (request, response) => {
+
+  if (request.body.getData === true) {
+    const data = await getAccountOpenData(request);
+    return response.status(200).send({ msg: "Account open customer data", Data: data });
+  }
 
   if (request.body.PIN !== undefined) { /** PIN is defined for ex: 9582 */
     OBJ.wantStorePIN = true; /** To store data in customer financial database */
@@ -44,6 +48,7 @@ exports.customerFinancialData = async (request, response) => {
 
       /** Data insreted successfully */
       await mongoose.connection.close();
+
       const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
       Database = "CustomerFinancials_Database";
       await checkConnection(Database);

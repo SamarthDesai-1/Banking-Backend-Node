@@ -105,7 +105,7 @@ exports.transferFund = async (request, response) => {
       else {
         const payment = Confirmation.senderBalance - amount;
 
-        if (payment < Conditions.minBalance) {
+        if (payment <= Conditions.minBalance) {
           return response.status(402).send({ msg: "Transfer amount exceeds the limits of minimum balance" });
         }
         else {          
