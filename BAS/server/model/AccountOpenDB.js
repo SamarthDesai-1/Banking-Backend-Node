@@ -87,3 +87,4 @@ const UserAccountOpenSchema = new mongoose.model("accountopenusers", schema);
 module.exports = UserAccountOpenSchema;
 
 
+
