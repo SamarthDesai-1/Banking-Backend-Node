@@ -38,6 +38,8 @@ app.use("/test/api/users", require("./routes/transferfunds_route"));
 
 app.use("/test/api/users", require("./routes/fetch_route"));
 
+app.use("/test/api/users", require("./routes/financialServices_route"));
+
 
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);

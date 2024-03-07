@@ -39,7 +39,7 @@ exports.verifyPIN = async (request, response) => {
 
           if (incrementOBJ.count < 3) {
             incrementOBJ.count++;
-            return response.status(402).send({ msg: "OTP is invalid" });
+            return response.status(402).send({ msg: "PIN is invalid" });
           }
 
           console.log("IN ELSE STATEMENT");
@@ -118,12 +118,12 @@ exports.forgetPIN = async (request, response) => {
 exports.matchPIN = async (request, response) => {
 
   try {
-    console.log(`OTP from client ${request.body.otp}`, "  ",` OTP of server ${OBJ.OTP}`);
+    console.log(`PIN from client ${request.body.otp}`, "  ",` PIN of server ${OBJ.OTP}`);
   
     if (request.body.otp === OBJ.OTP) {
-      return response.status(200).send({ msg: `OTP is authenticated successfully` });
+      return response.status(200).send({ msg: `PIN is authenticated successfully` });
     }
-    return response.status(402).send({ msg: "Given OTP is unauthorized or expires time limit" });
+    return response.status(402).send({ msg: "Given PIN is unauthorized or expires time limit" });
     
   } catch (error) {
     return response.status(402).send({ error: error });

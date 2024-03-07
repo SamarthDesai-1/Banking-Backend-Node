@@ -2,8 +2,6 @@ const JWT = require("jsonwebtoken");
 
 const verifyToken = (request, response, next) => {
 
-  console.log(request.body);
-
   console.log("Request body comming from frontend : ", request);
 
   let token = request.body.sessionToken;
