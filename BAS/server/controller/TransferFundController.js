@@ -156,5 +156,8 @@ exports.transferFund = async (request, response) => {
     await settlePayment(request.body);
     await mongoose.connection.close();
   }
+  else {
+    return response.status(402).send({ msg: "PIN is invalid" });
+  }
 
 };

@@ -14,6 +14,27 @@ const OBJ = {
   selfPIN: undefined,
 };
 
+/** Entry in statement of account status database */
+const generateStatement = async ({ amount, sessionEmail }, Status) => {
+
+  await mongoose.connection.close();
+  const AccountStatusSchema = require("../model/AccountStatusDB");
+  let Database = "AccountStatus_Database";
+  await checkConnection(Database);
+  
+  const obj = {
+    date: new Date(),
+    transferAmount: amount,
+    senderAccountNo: "",
+    recevierAccountNo: "",
+    status: "success",
+    statementStatus: `${Status === "Dr" ? "Dr" : "Cr" }`,
+    msg: `$${amount} has been ${Status === "Dr" ? "Debited" : "Credited" } to account`
+  };
+  
+  await AccountStatusSchema.updateOne({ Email: sessionEmail }, { $push: { TransactionHistory: [obj] } }, { new: true });
+};
+
 exports.addFunds = async (request, response) => {
 
   /** insert in new account status database and update in customer financial database */
@@ -106,6 +127,7 @@ exports.addFunds = async (request, response) => {
 
   await updateFunds(request.body);
 
+  
   if (!OBJ.addFundsPIN) {
     OBJ.addFundsPIN = true;
     return response.status(402).send({ msg: "Retype PIN is invalid" });
@@ -118,7 +140,8 @@ exports.addFunds = async (request, response) => {
     OBJ.addFundAmountNegative = true;
     return response.status(402).send({ msg: "Invalid Mathematical Expression Amount should be in positive  ot negative" , request: "rejected" });
   }
-
+  
+  await generateStatement(request.body, "Cr");
   return response.status(200).send({ msg: "Add funds successfully", status: "success", request: true });
 };
 
@@ -199,6 +222,9 @@ exports.withdrawFunds = async (request, response) => {
     
             await AccountStatusSchema.updateOne({ _id: data[0]._id }, { $set: { Balance: OBJ.Amount } }, { new: true });
             OBJ.isExecutedForWITHDRAWFUNDS = true;
+
+            await generateStatement(request.body, "Dr");
+
           }
         }
         else {
