@@ -59,9 +59,13 @@ exports.issueCard = async (request, response) => {
       AccountNo: formData.AccountNo,
     });
   
-    await cardIssue.save().then(data => console.log("New debit card isssue data : ", data)).catch((e) => console.log("Error : ", e));
+    let object = {};
+    await cardIssue.save().then(data => {
+      console.log("New debit card isssue data : ", data);
+      object = data;
+    }).catch((e) => console.log("Error : ", e));
 
-    return response.status(200).send({ msg: "API test successfully" });
+    return response.status(200).send({ msg: "Data inserted successfully", Data: object });
   }
 
 
@@ -82,18 +86,3 @@ exports.fetchCardDetails = async (request, response) => {
 
 };
 
-exports.updateCardDetails = async (request, response) => {
-
-  const { sessionEmail } = request.body;
-  
-  await mongoose.connection.close();
-  Database = "FinancialServices_Database";
-  await checkConnection(Database);
-  const DebitCardSchema = require("../model/FinancialServicesDB");
-  
-  const data = await DebitCardSchema.find({ Email: sessionEmail }, { DebitCardNumber: 1, ExpiryDate: 1, CVV: 1 });
-
-  return response.status(200).send({ msg: "Updated Data successfully", Data: data });
-  
-
-};
