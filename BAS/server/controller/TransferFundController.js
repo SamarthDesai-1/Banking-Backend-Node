@@ -10,8 +10,6 @@ const OBJ = {
 
 exports.transferFund = async (request, response) => {
 
-  /** const sessionEmail = request.body.sessionEmail */
-
   const { amount, pin } = request.body;
 
   const first = amount.charAt(0) === '0' ? true : false;
@@ -80,75 +78,83 @@ exports.transferFund = async (request, response) => {
       Confirmation.senderAccountNo = data[0].AccountNo;
       console.log(data);
     });
-    const recevierSide = await AccountStatusSchema.find({ AccountNo: recevier }).then(data => {
-      Confirmation.recevierToken = data[0].Token;
-      Confirmation.recevierBalance = data[0].Balance;
-      Confirmation.recevierAccountNo = data[0].AccountNo;
-      console.log(data);
-    });
 
-    console.log("server side : ", senderSide);
-    console.log("recevier side : ", recevierSide);
+    try {
+      const recevierSide = await AccountStatusSchema.find({ AccountNo: recevier }).then(data => {
+        Confirmation.recevierToken = data[0].Token;
+        Confirmation.recevierBalance = data[0].Balance;
+        Confirmation.recevierAccountNo = data[0].AccountNo;
+        console.log(data);
+      });
+      console.log("server side : ", senderSide);
+      console.log("recevier side : ", recevierSide);
+    } catch (error) {
+      return response.status(402).send({ msg: "Retye recevier account no is not exists", status: true });
+    }
+
 
     /** PIN verify code at here in if statement */
 
-    if (Confirmation.senderToken === Confirmation.recevierToken) {
+    if (recevier === Confirmation.recevierAccountNo) { /** verify recevier account number */
 
-      console.log("Sender : ", Confirmation.senderBalance + " " + "Recevier : " +  Confirmation.recevierBalance + " " + amount);
+      if (Confirmation.senderToken === Confirmation.recevierToken) {
 
-      if (Confirmation.senderBalance < amount) { /** if not have enough funds in acoount to carry transaction */
-        return response.status(402).send({ msg: "Inappropriate bank balance for payment", status: false });
-      }
-      else if (amount < 0) {
-        return response.status(402).send({ msg: "Invalid mathematical expression amount not should be in negative", status: false });
-      }
-      else {
-        const payment = Confirmation.senderBalance - amount;
-
-        if (payment <= Conditions.minBalance) {
-          return response.status(402).send({ msg: "Transfer amount exceeds the limits of minimum balance" });
+        console.log("Sender : ", Confirmation.senderBalance + " " + "Recevier : " +  Confirmation.recevierBalance + " " + amount);
+  
+        if (Confirmation.senderBalance < amount) { /** if not have enough funds in acoount to carry transaction */
+          return response.status(402).send({ msg: "Inappropriate bank balance for payment", status: false });
         }
-        else {          
-
-          const recevierAmount = Confirmation.recevierBalance + amount; /** - = dr and + = cr */
-
-          const obj = {
-            date: new Date(),
-            transferAmount: amount,
-            senderAccountNo: Confirmation.senderAccountNo,
-            recevierAccountNo: Confirmation.recevierAccountNo,
-            status: "success",
-            statementStatus: "Dr",
-            msg: msg
-          };
-
-          /** sender */
-          await AccountStatusSchema.updateOne({ Email: sessionEmail }, { $set: { Balance: payment, Token: "" }, $push: { TransactionHistory: [obj] } }, { new: true });
-
-          obj.statementStatus = "Cr";
-          
-          /** recevier */
-          await AccountStatusSchema.updateOne({ AccountNo: recevier }, { $set: { Balance: recevierAmount, Token: "" }, $push: { TransactionHistory: [obj] } }, { new: true });
-
-          await mongoose.connection.close();
-          const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
-          let Database = "CustomerFinancials_Database";
-          await checkConnection(Database);
-
-          await CustomerFinancialasData.updateOne({ AccountNo: recevier }, { $set: { Balance: recevierAmount } }, { new: true });
-          await CustomerFinancialasData.updateOne({ Email: sessionEmail }, { $set: { Balance: payment } }, { new: true });
-
-          await mongoose.connection.close();
-
-          OBJ.isExecuted = true;
-          if (OBJ.isExecuted) {
+        else if (amount < 0) {
+          return response.status(402).send({ msg: "Invalid mathematical expression amount not should be in negative", status: false });
+        }
+        else {
+          const payment = Confirmation.senderBalance - amount;
+  
+          if (payment <= Conditions.minBalance) {
+            return response.status(402).send({ msg: "Transfer amount exceeds the limits of minimum balance" });
+          }
+          else {          
+  
+            const recevierAmount = Confirmation.recevierBalance + amount; /** - = dr and + = cr */
+  
+            const obj = {
+              date: new Date(),
+              transferAmount: amount,
+              senderAccountNo: Confirmation.senderAccountNo,
+              recevierAccountNo: Confirmation.recevierAccountNo,
+              status: "success",
+              statementStatus: "Dr",
+              msg: msg
+            };
+  
+            /** sender */
+            await AccountStatusSchema.updateOne({ Email: sessionEmail }, { $set: { Balance: payment, Token: "" }, $push: { TransactionHistory: [obj] } }, { new: true });
+  
+            obj.statementStatus = "Cr";
+            
+            /** recevier */
+            await AccountStatusSchema.updateOne({ AccountNo: recevier }, { $set: { Balance: recevierAmount, Token: "" }, $push: { TransactionHistory: [obj] } }, { new: true });
+  
             await mongoose.connection.close();
-            return response.status(200).send({ msg: "Transfer funds successfully" });
+            const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
+            let Database = "CustomerFinancials_Database";
+            await checkConnection(Database);
+  
+            await CustomerFinancialasData.updateOne({ AccountNo: recevier }, { $set: { Balance: recevierAmount } }, { new: true });
+            await CustomerFinancialasData.updateOne({ Email: sessionEmail }, { $set: { Balance: payment } }, { new: true });
+  
+            await mongoose.connection.close();
+  
+            OBJ.isExecuted = true;
+            if (OBJ.isExecuted) {
+              await mongoose.connection.close();
+              return response.status(200).send({ msg: "Transfer funds successfully" });
+            }
           }
         }
       }
-
     }
+    
     await mongoose.connection.close();
   };
 
