@@ -40,6 +40,7 @@ app.use("/test/api/users", require("./routes/getFDdata_route"));
 app.use("/test/api/users", require("./routes/getAccountOpenData_route"));
 app.use("/test/api/users", require("./routes/getAllCustomerData_route"));
 app.use("/test/api/users", require("./routes/getAllTransaction_route"));
+app.use("/test/api/users", require("./routes/getContactData_route"));
 
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);
