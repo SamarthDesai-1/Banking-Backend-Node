@@ -138,12 +138,13 @@ exports.existsFD = async (request, response) => {
   await checkConnection(Database);
 
   const data = await UserFD.find({ Email: sessionEmail });
+  console.log("Data : ", data);
 
-  if (data) {
-    return response.status(200).send({ msg: "About existance", Data: data });
+  if (data.length == 0) {
+    return response.status(402).send({ msg: "Please create a new FD then after view status" });
   }
   else {
-    return response.status(402).send({ msg: "Please create a new FD then after view status" });
+    return response.status(200).send({ msg: "About existance", Data: data });
   }
   
 };
