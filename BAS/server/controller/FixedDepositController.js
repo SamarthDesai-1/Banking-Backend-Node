@@ -109,18 +109,35 @@ exports.openFD = async (request, response) => {
         }).catch((e) => {
           console.log(e);
           bool = false;
-          return response.status(402).send({ msg: "Duplicate data error", error: e });
+          return response.status(402).send({ msg: "You are already create an fixed deposit", error: e });
         });
         
-        await generateStatement(amount, sessionEmail, "Dr");
-        await updateFunds(FD, sessionEmail);
-
-        if (bool)
+        
+        if (bool) {
+          
+          await updateFunds(FD, sessionEmail);
+          await generateStatement(amount, sessionEmail, "Dr");
           return response.status(200).send({ msg: { Response: { Message: "API testing successfully", Data: responseData } } });
+
+        }
       }
     }
   }
   else {
     return response.status(402).send({ msg: "Retype pin is invalid" });
   }
+};
+
+
+exports.existsFD = async (request, response) => {
+
+  const { sessionEmail } = request.body;
+  await mongoose.connection.close();
+  Database = "FixedDeposit_Database";
+  const UserFD = require("../model/FixedDepositDB");
+  await checkConnection(Database);
+
+  const data = await UserFD.find({ Email: sessionEmail });
+
+  return response.status(200).send({ msg: "About existance", Data: data });
 };
