@@ -26,21 +26,20 @@ app.get("/", (request, response) => {
 app.use("/test/api/users", require("./routes/signup_route"));
 app.use("/test/api/users", require("./routes/login_route"));
 app.use("/test/api/users", require("./routes/contact_route"));
-
 app.use("/test/api/users", require("./routes/accountopen_route"));
-app.use("/test/api/users", require("./routes/customerfinancial_route"));
-
+app.use("/test/api/users", require("./routes/customerfinancial_route"))
 app.use("/test/api/users", require("./routes/pinVerify_route"));
-
 app.use("/test/api/users", require("./routes/accountstatus_route"));
-
 app.use("/test/api/users", require("./routes/transferfunds_route"));
-
 app.use("/test/api/users", require("./routes/fetch_route"));
-
 app.use("/test/api/users", require("./routes/financialServices_route"));
-
 app.use("/test/api/users", require("./routes/fixeddeposit_route"));
+app.use("/test/api/users", require("./routes/getSignupData_route"));
+app.use("/test/api/users", require("./routes/getDebitCardData_route"));
+app.use("/test/api/users", require("./routes/getFDdata_route"));
+app.use("/test/api/users", require("./routes/getAccountOpenData_route"));
+app.use("/test/api/users", require("./routes/getAllCustomerData_route"));
+app.use("/test/api/users", require("./routes/getAllTransaction_route"));
 
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);
