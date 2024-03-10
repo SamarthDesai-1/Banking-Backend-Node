@@ -63,10 +63,11 @@ exports.deleteAccount = async (request, response) => {
   console.log(updateDATA);
   const data = await AccountCloseSchema.updateOne({ AccountNo: id }, { $set: { Status: `${updateDATA}` } });
 
-  await AccountCloseSchema.deleteOne({ AccountNo: id });
-
+  
   if (updateDATA === "success") {
-
+    
+    await AccountCloseSchema.deleteOne({ AccountNo: id });
+    
     const accountOpenDatabase = async (id) => {
       await mongoose.connection.close();
       const UserAccountOpenSchema = require("../model/AccountOpenDB");
