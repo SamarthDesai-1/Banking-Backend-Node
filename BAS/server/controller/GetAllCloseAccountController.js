@@ -34,13 +34,27 @@ exports.getClosed = async (request, response) => {
 };
 
 
-// exports.deleteAccount = async (request, response) => {
+exports.deleteAccount = async (request, response) => {
 
-//   const { id, status } = request.body;
+  const { id, status } = request.body;
 
-//   await mongoose.connection.close();
-//   let Database = "CloseAccount_Database";
-//   await checkConnection(Database);
+  await mongoose.connection.close();
+  let Database = "CloseAccount_Database";
+  await checkConnection(Database);
 
-//   const data = await AccountCloseSchema.updateOne({ AccountNo: id }, { $set: { Status: "" } })
-// };
+  let updateDATA = undefined;
+  if (status === "confirm") {
+    updateDATA = "success";
+  }
+  else {
+    updateDATA = "reject";
+  }
+
+  console.log(updateDATA);
+  const data = await AccountCloseSchema.updateOne({ AccountNo: id }, { $set: { Status: `${updateDATA}` } });
+
+  if (updateDATA === "success") 
+    return response.status(200).send({ msg: "Admin user has been deleted from the database" });
+    
+  return response.status(402).send({ msg: "Admin user request has been rejected" });
+};
