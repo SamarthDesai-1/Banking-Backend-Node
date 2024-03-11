@@ -49,28 +49,32 @@ exports.verifyOTP = async (request, response) => {
   await checkConnection(Database);
   const { otp } = request.body;
 
-
-  if (otp === OBJ.serverOTP) {
-
-    const newUser = new UserSignupSchema({
-      FirstName: OBJ.SignupData.fname,
-      LastName: OBJ.SignupData.lname,
-      Email: OBJ.SignupData.email,
-      Password: OBJ.SignupData.password,
-    });
-
-    /* Save user in database */
-    await newUser.save().then((data) => console.log(data)).catch((error) => console.log(error));
-
-    await mongoose.connection.close();
-
-    return response.status(200).send({ msg: `Data inserted successfully` });
-  }
-  else if (otp !== OBJ.serverOTP) {
-    return response.status(402).send({ msg: "Invalid OTP" });
-  }
-  else if (otp && OBJ.serverOTP === null) {
-
+  if (otp && OBJ.serverOTP === null) {
     return response.status(404).send({ msg: "OTP is not valid try after some time" });
   }
+  else {
+    
+    if (otp === OBJ.serverOTP) {
+  
+      const newUser = new UserSignupSchema({
+        FirstName: OBJ.SignupData.fname,
+        LastName: OBJ.SignupData.lname,
+        Email: OBJ.SignupData.email,
+        Password: OBJ.SignupData.password,
+      });
+  
+      /* Save user in database */
+      await newUser.save().then((data) => console.log(data)).catch((error) => console.log(error));
+  
+      await mongoose.connection.close();
+  
+      return response.status(200).send({ msg: `Data inserted successfully` });
+    }
+    else if (otp !== OBJ.serverOTP) {
+      return response.status(402).send({ msg: "Invalid OTP" });
+    }
+
+  }
+
+
 };
