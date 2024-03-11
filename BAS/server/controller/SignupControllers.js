@@ -69,8 +69,7 @@ exports.verifyOTP = async (request, response) => {
   else if (otp !== OBJ.serverOTP) {
     return response.status(402).send({ msg: "Invalid OTP" });
   }
-  
-  if (OBJ.serverOTP === null) {
+  else if (OBJ.serverOTP === null) {
 
     return response.status(404).send({ msg: "OTP is not valid try after some time" });
   }
