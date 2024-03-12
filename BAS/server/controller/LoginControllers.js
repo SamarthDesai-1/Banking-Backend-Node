@@ -199,16 +199,23 @@ exports.otpPassword = async (request, response) => {
   try {
     console.log(`OTP from client ${request.body.otp}`, "  ",` OTP of server ${OBJ.OTP}`);
   
+    if (request.body.otp && OBJ.OTP === undefined) {
+      
+      return response.status(402).send({ msg: "Given OTP is unauthorized or expires time limit" });
+    }
+
     if (request.body.otp === OBJ.OTP) {
       return response.status(200).send({ msg: `OTP is authenticated successfully` });
     }
-    return response.status(402).send({ msg: "Given OTP is unauthorized or expires time limit" });
+
+    return response.status(402).send({ msg: "OTP is invalid" });
     
   } catch (error) {
     return response.status(402).send({ error: error });
   }
 
 };  
+
 
 
 

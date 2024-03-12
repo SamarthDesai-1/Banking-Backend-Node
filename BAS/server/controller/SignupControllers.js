@@ -49,32 +49,52 @@ exports.verifyOTP = async (request, response) => {
   await checkConnection(Database);
   const { otp } = request.body;
 
+  
+  
   if (otp && OBJ.serverOTP === null) {
-    return response.status(404).send({ msg: "OTP is not valid try after some time" });
+
+    console.log();
+    console.log("Setimeout");
+    console.log(otp);
+    console.log(OBJ.serverOTP);
+    console.log();
+    console.log("otp && OBJ.serverOTP === null");
+    console.log();
+
+    return response.status(404).send({ msg: "Given OTP is unauthorized or expires time limit" });
   }
+
+  if (otp === OBJ.serverOTP) {
+
+    console.log();
+    console.log("otp === OBJ.serverOTP");
+    console.log();
+
+    const newUser = new UserSignupSchema({
+      FirstName: OBJ.SignupData.fname,
+      LastName: OBJ.SignupData.lname,
+      Email: OBJ.SignupData.email,
+      Password: OBJ.SignupData.password,
+    });
+  
+    /* Save user in database */
+    await newUser.save().then((data) => console.log(data)).catch((error) => console.log(error));
+
+    await mongoose.connection.close();
+  
+    return response.status(200).send({ msg: `Data inserted successfully` });
+  }
+
   else {
-    
-    if (otp === OBJ.serverOTP) {
-  
-      const newUser = new UserSignupSchema({
-        FirstName: OBJ.SignupData.fname,
-        LastName: OBJ.SignupData.lname,
-        Email: OBJ.SignupData.email,
-        Password: OBJ.SignupData.password,
-      });
-  
-      /* Save user in database */
-      await newUser.save().then((data) => console.log(data)).catch((error) => console.log(error));
-  
-      await mongoose.connection.close();
-  
-      return response.status(200).send({ msg: `Data inserted successfully` });
-    }
-    else if (otp !== OBJ.serverOTP) {
-      return response.status(402).send({ msg: "Invalid OTP" });
-    }
 
+    console.log(otp);
+    console.log(OBJ.serverOTP);
+      
+    console.log();
+    console.log("otp !== OBJ.serverOTP");
+    console.log();
+
+    return response.status(402).send({ msg: "Invalid OTP" });
   }
-
-
 };
+
