@@ -45,7 +45,12 @@ exports.applyLoan = async (request, response) => {
     return Math.random() * (max - min) + min;
   };
 
-  const { sessionEmail, age, profession, monthlyIncome, reason, address, first, last, employee, accountno, aadharcard, pancard } = request.body;
+  let amount = (4000000 * 12.95) / 100;
+  console.log(amount);
+
+  console.log(request.body);
+
+  const { sessionEmail, formData } = request.body;
 
   await mongoose.connection.close();
   const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
@@ -56,10 +61,10 @@ exports.applyLoan = async (request, response) => {
 
   console.log(data[0].AadharCard);
   console.log(data[0].PanCard);
-  if (data[0].AadharCard !== aadharcard) {
+  if (data[0].AadharCard !== formData.AadharCard) {
     return response.status(402).send({ msg: "Aadhar card does not match retype it." });
   }
-  else if (data[0].PanCard !== pancard) {
+  else if (data[0].PanCard !== formData.PanCard) {
     return response.status(402).send({ msg: "Pan card does not match retype it." });
   }
 
@@ -70,18 +75,18 @@ exports.applyLoan = async (request, response) => {
   const secondDocumentId = new mongoose.Types.ObjectId(data[0]._id);
   const newUserLoan = new UserLoan({
     _id: secondDocumentId,
-    Age: age,
+    Age: formData.Age,
     Balance: data[0].Balance,
-    Profession: profession,
-    MonthlyIncome: monthlyIncome,
-    Reason: reason,
-    Address: address,
+    Profession: formData.Profession,
+    MonthlyIncome: formData.MonthlyIncome,
+    Reason: formData.Reason,
+    Address: formData.Address,
     PanCard: data[0].PanCard,
     AadharCard: data[0].AadharCard,
-    FirstName: first,
-    LastName: last,
-    Employee: employee,
-    AccountNo: accountno,
+    FirstName: formData.FirstName,
+    LastName: formData.LastName,
+    Employee: formData.flexRadioDefault,
+    AccountNo: data[0].AccountNo,
     interest: getRandomDecimal(9, 13).toFixed(2),
   });
 

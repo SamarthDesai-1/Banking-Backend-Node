@@ -5,7 +5,7 @@ exports.getChartData = async (request, response) => {
 
   let ResponseData = [];
 
-  await mongoose.connection.close();
+  // await mongoose.connection.close();
   const AccountStatusSchema = require("../model/AccountStatusDB");
   let Database = "AccountStatus_Database";
   await checkConnection(Database);
@@ -29,57 +29,61 @@ exports.getChartData = async (request, response) => {
   let dateString = undefined;
 
   
-  let zeroBased = 0;
-  for (let i = start; i <= end; i++) {
+  const getDATA = async () => {
+    let zeroBased = 0;
+    for (let i = start; i <= end; i++) {
 
-    dateString = year.toString() + "-" + month.toString() + "-" + i.toString() + "";
-    let userSpecifiedDate = new Date(dateString);
+      dateString = year.toString() + "-" + month.toString() + "-" + i.toString() + "";
+      let userSpecifiedDate = new Date(dateString);
 
-    console.log(userSpecifiedDate);
+      console.log(userSpecifiedDate);
 
-    const data = await AccountStatusSchema.aggregate([
-      { $unwind: "$TransactionHistory" },
-      {
-        $match: {
-          $or: [ 
-            { "TransactionHistory.statementStatus": "Cr" },
-            { "TransactionHistory.statementStatus": "Dr" }
-          ]
-        }
-      },
-      {
-        $addFields: {
-          "TransactionHistory.date": {
-            $dateToString: {
-              format: "%Y-%m-%d",
-              date: "$TransactionHistory.date"
+      const data = await AccountStatusSchema.aggregate([
+        { $unwind: "$TransactionHistory" },
+        {
+          $match: {
+            $or: [ 
+              { "TransactionHistory.statementStatus": "Cr" },
+              { "TransactionHistory.statementStatus": "Dr" }
+            ]
+          }
+        },
+        {
+          $addFields: {
+            "TransactionHistory.date": {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$TransactionHistory.date"
+              }
             }
           }
+        },
+        {
+          $match: { "TransactionHistory.date": userSpecifiedDate.toISOString().substring(0, 10) }
+        },
+        {
+          $group: {
+            _id: null,
+            date: { $first: year.toString() + "-" + month.toString() + "-" + zeroBased.toString() + "" },
+            balance: { $first: bal[0].totalBalance },
+            creditAmount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Cr"] }, "$TransactionHistory.transferAmount", 0] } },
+            debitCount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Dr"] }, 1, 0] } },
+            debitAmount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Dr"] }, "$TransactionHistory.transferAmount", 0] } }
+          }
         }
-      },
-      {
-        $match: { "TransactionHistory.date": userSpecifiedDate.toISOString().substring(0, 10) }
-      },
-      {
-        $group: {
-          _id: null,
-          date: { $first: year.toString() + "-" + month.toString() + "-" + zeroBased.toString() + "" },
-          balance: { $first: bal[0].totalBalance },
-          creditAmount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Cr"] }, "$TransactionHistory.transferAmount", 0] } },
-          debitCount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Dr"] }, 1, 0] } },
-          debitAmount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Dr"] }, "$TransactionHistory.transferAmount", 0] } }
-        }
-      }
-    ]);
-    zeroBased++;
-  
-    console.log(data);
+      ]);
+      zeroBased++;
+    
+      console.log(data);
 
-    if (data.length != 0) 
-      ResponseData.push(data[0]);
+      if (data.length != 0) 
+        ResponseData.push(data[0]);
 
-    date.setDate(date.getDate() + 1);
-  }
+      date.setDate(date.getDate() + 1);
+    }
+  };
+
+  await getDATA();
 
   return response.status(200).send({ msg: "API testing", Data: ResponseData });
 }
@@ -130,5 +134,6 @@ exports.getServiceData = async (request, response) => {
   ratioOBJ.debitPercent = (OBJ.DebitCardUsers * 100) / OBJ.Users;
   ratioOBJ.FDusers = (OBJ.FDusers * 100) / OBJ.Users;
 
-  return response.status(200).send({ msg: "API testing", Data: ratioOBJ });
+  return response.status(200).send({ msg: "API testing", Data: ratioOBJ,  });
 };
+
