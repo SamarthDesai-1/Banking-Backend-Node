@@ -28,7 +28,7 @@ const verifyToken = (request, response, next) => {
 
   }
   else {
-    return response.status(402).send({ msg: "Please add token with header or kindly login to access financials" });
+    return response.status(402).send({ msg: "Please kindly login to access financials" });
   }
 
   console.log("Random token : ", token);

@@ -120,10 +120,15 @@ exports.matchPIN = async (request, response) => {
   try {
     console.log(`PIN from client ${request.body.otp}`, "  ",` PIN of server ${OBJ.OTP}`);
   
+    if (request.body.otp && OBJ.OTP === undefined) {
+      return response.status(402).send({ msg: "Given OTP is unauthorized or expires time limit" });
+    }
+
     if (request.body.otp === OBJ.OTP) {
       return response.status(200).send({ msg: `PIN is authenticated successfully` });
     }
-    return response.status(402).send({ msg: "Given PIN is unauthorized or expires time limit" });
+
+    return response.status(402).send({ msg: "OTP is invalid" });
     
   } catch (error) {
     return response.status(402).send({ error: error });
