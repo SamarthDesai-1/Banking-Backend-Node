@@ -51,3 +51,4 @@ const AccountStatusSchema = new mongoose.model("AccountStatusData", schema);
 
 module.exports = AccountStatusSchema;
 
+

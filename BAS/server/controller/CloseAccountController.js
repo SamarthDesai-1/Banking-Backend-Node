@@ -32,7 +32,7 @@ exports.closeAccount = async (request, response) => {
       console.log(data);
       return response.status(200).send({ msg: "API testing", statusProcess: true });
     }).catch((e) => {
-      return response.status(402).send({ msg: "Your account close request is already in process." })
+      return response.status(402).send({ msg: e })
     });
 
   }

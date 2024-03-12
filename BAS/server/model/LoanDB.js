@@ -53,5 +53,29 @@ const schema = new mongoose.Schema({
   Employee: {
     type: String,
     default: ""
+  },
+  AccountNo: {
+    type: String,
+    default: ""
+  },
+  interest: {
+    type: Number,
+    default: "9.5"
+  },
+  Installments: {
+    type: [
+      {
+        installmentAmount: Number,
+        date: Date,
+        LoanType: String,
+        AccountNo: String,
+        RemainingLoanAmount: Number,
+        LoanAmount: Number /** with interest rate */
+      }
+    ]
   }
 });
+
+const UserLoan = new mongoose.model("loandata", schema);
+
+module.exports = UserLoan;

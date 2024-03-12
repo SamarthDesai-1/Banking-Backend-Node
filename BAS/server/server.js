@@ -45,6 +45,7 @@ app.use("/test/api/users", require("./routes/getAllDebitTransaction_route"));
 app.use("/test/api/users", require("./routes/closeAccount_route"));
 app.use("/test/api/users", require("./routes/getAllCloseAccount_route"));
 app.use("/test/api/users", require("./routes/getChartData_route"));
+app.use("/test/api/users", require("./routes/loan_route"));
 
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);
