@@ -143,6 +143,10 @@ exports.updatePIN = async (request, response) => {
   let Database = "CustomerFinancials_Database";
   await checkConnection(Database);
 
+  if (request.body.PIN === undefined) {
+    return response.status(402).send({ msg: "Please enter PIN first" });
+  }
+
   const updateData = await CustomerFinancialasData.updateOne({ Email: request.body.sessionEmail }, { $set: { PIN: request.body.PIN } }, { new: true } );
 
   await mongoose.connection.close();
