@@ -6,3 +6,4 @@ route.post("/get-data", controller.getChartData);
 route.post("/get-service", controller.getServiceData);
 
 module.exports = route;
+

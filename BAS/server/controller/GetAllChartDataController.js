@@ -5,7 +5,7 @@ exports.getChartData = async (request, response) => {
 
   let ResponseData = [];
 
-  // await mongoose.connection.close();
+  await mongoose.connection.close();
   const AccountStatusSchema = require("../model/AccountStatusDB");
   let Database = "AccountStatus_Database";
   await checkConnection(Database);
@@ -27,6 +27,40 @@ exports.getChartData = async (request, response) => {
   let end = month % 2 == 1 ? 31 : 30;
   
   let dateString = undefined;
+
+  const total = await AccountStatusSchema.aggregate([
+    {
+      $unwind: "$TransactionHistory"
+    },
+    {
+      $match: {
+        $or: [
+          { "TransactionHistory.statementStatus": "Dr" },
+          { "TransactionHistory.statementStatus": "Cr" }
+        ]
+      }
+    },
+    {
+      $group: {
+        _id: "$TransactionHistory.statementStatus",
+        totalAmount: {
+          $sum: "$TransactionHistory.transferAmount"
+        }
+      }
+    },
+    {
+      $sort: {
+        _id: 1 
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totals: { $push: "$totalAmount" }
+      }
+    }
+  ]);
+  console.log(total);
 
   
   const getDATA = async () => {
@@ -85,7 +119,7 @@ exports.getChartData = async (request, response) => {
 
   await getDATA();
 
-  return response.status(200).send({ msg: "API testing", Data: ResponseData });
+  return response.status(200).send({ msg: "API testing", Data: ResponseData, StatementStatus: total });
 }
 
 exports.getServiceData = async (request, response) => {
