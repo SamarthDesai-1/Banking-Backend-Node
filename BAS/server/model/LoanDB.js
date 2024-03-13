@@ -89,6 +89,19 @@ const schema = new mongoose.Schema({
   LoanTimePeriod: {
     type: Number,
     default: 5
+  },
+  LoanInfo: {
+    type: [
+      {
+        StartingDate: Date,
+        EndingDate: Date,
+        InstallmentAmount: Number,
+        AmountWithInterest: Number,
+        LoanAmount: Number,
+        LoanTimePeriod: Number
+      }
+    ],
+    default: []
   }
 });
 

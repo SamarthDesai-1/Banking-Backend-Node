@@ -124,3 +124,6 @@ exports.existsLoan = async (request, response) => {
 
 };
 
+exports.approveLoan = async () => {
+  
+};
