@@ -89,7 +89,8 @@ exports.applyLoan = async (request, response) => {
     AccountNo: data[0].AccountNo,
     interest: getRandomDecimal(9, 13).toFixed(2),
     Email: sessionEmail,
-    LoanAmount: Number.parseInt(formData.Amount)
+    LoanAmount: Number.parseInt(formData.Amount),
+    LoanTimePeriod: formData.Years
   });
 
   /** save the use */
@@ -112,3 +113,14 @@ exports.rejectLoan = async (request, response) => {
 
   return response.status(200).send({ msg: "API testing" });
 };
+
+exports.existsLoan = async (request, response) => {
+
+  console.log(request.body);
+
+  console.log("exists loan api call");
+
+  return response.status(200).send({ msg: "Ok" });
+
+};
+

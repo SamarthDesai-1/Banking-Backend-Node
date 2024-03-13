@@ -85,6 +85,10 @@ const schema = new mongoose.Schema({
   Status: {
     type: String,
     default: "Pending"
+  },
+  LoanTimePeriod: {
+    type: Number,
+    default: 5
   }
 });
 
