@@ -144,6 +144,12 @@ exports.transferFund = async (request, response) => {
             await CustomerFinancialasData.updateOne({ Email: sessionEmail }, { $set: { Balance: payment } }, { new: true });
   
             await mongoose.connection.close();
+
+             /** Update newbalance in loan database */
+             await mongoose.connection.close();
+             const UserLoan = require("../model/LoanDB");
+             await checkConnection("Loan_Database");
+             await UserLoan.updateOne({ Email: sessionEmail }, { $set: { Balance: payment } }, { new: true });
   
             OBJ.isExecuted = true;
             if (OBJ.isExecuted) {

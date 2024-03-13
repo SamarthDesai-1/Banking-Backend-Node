@@ -73,6 +73,18 @@ const schema = new mongoose.Schema({
         LoanAmount: Number /** with interest rate */
       }
     ]
+  },
+  Email: {
+    type: String,
+    unique: true
+  },
+  LoanAmount: {
+    type: Number,
+    default: 0
+  },
+  Status: {
+    type: String,
+    default: "Pending"
   }
 });
 

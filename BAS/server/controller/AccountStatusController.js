@@ -98,6 +98,12 @@ exports.addFunds = async (request, response) => {
             newBalance = oldBalance + amount;
             console.log(`RandomString from AccountStatus Database : ${data[0].DigitalSignature} and RandomString from client is : ${OBJ.RandomStringServer}`);
             await CustomerFinancialasData.updateOne({ Email: sessionEmail }, { $set: { Balance: newBalance } }, { new: true });
+
+            /** Update newbalance in loan database */
+            await mongoose.connection.close();
+            const UserLoan = require("../model/LoanDB");
+            await checkConnection("Loan_Database");
+            await UserLoan.updateOne({ Email: sessionEmail }, { $set: { Balance: newBalance } }, { new: true });
           }
           else {
             OBJ.addFundsPIN = false;
@@ -221,6 +227,13 @@ exports.withdrawFunds = async (request, response) => {
             }
     
             await AccountStatusSchema.updateOne({ _id: data[0]._id }, { $set: { Balance: OBJ.Amount } }, { new: true });
+
+            /** Update newbalance in loan database */
+            await mongoose.connection.close();
+            const UserLoan = require("../model/LoanDB");
+            await checkConnection("Loan_Database");
+            await UserLoan.updateOne({ Email: sessionEmail }, { $set: { Balance: OBJ.Amount } }, { new: true });
+
             OBJ.isExecutedForWITHDRAWFUNDS = true;
 
             await generateStatement(request.body, "Dr");

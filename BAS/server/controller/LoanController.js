@@ -88,10 +88,27 @@ exports.applyLoan = async (request, response) => {
     Employee: formData.flexRadioDefault,
     AccountNo: data[0].AccountNo,
     interest: getRandomDecimal(9, 13).toFixed(2),
+    Email: sessionEmail,
+    LoanAmount: Number.parseInt(formData.Amount)
   });
 
   /** save the use */
   await newUserLoan.save().then(data => console.log(data)).catch((e) => console.log(e));
 
   return response.status(200).send({ msg: "API testing", Data: data });
+};
+
+
+exports.rejectLoan = async (request, response) => {
+
+  const { id } = request.body;
+
+  await mongoose.connection.close();
+  const UserLoan = require("../model/LoanDB");
+  await checkConnection("Loan_Database");
+
+  const data = await UserLoan.deleteOne({ _id: id });
+  console.log(data);
+
+  return response.status(200).send({ msg: "API testing" });
 };
