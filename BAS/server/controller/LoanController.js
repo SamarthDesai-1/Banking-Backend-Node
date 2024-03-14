@@ -1,44 +1,6 @@
 const mongoose = require('mongoose');
 const checkConnection = require("../CheckConnections/CheckConnections");
 
-const OBJ = {
-  TotalDeposits: undefined,
-  LoanApproved: false,
-  TotalLoanAmountWithInterest: undefined,
-};
-
-// const funds = async () => {
-
-  // const getRandomDecimal = (min, max) => {
-  //   return Math.random() * (max - min) + min;
-  // }
-
-//   await mongoose.connection.close();
-//   const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
-//   await checkConnection("CustomerFinancials_Database");
-
-//   const balance = await CustomerFinancialasData.aggregate([
-//     {
-//       $group: {
-//         _id: null,
-//         totalBalance: { $sum: "$Balance" }
-//       }
-//     }
-//   ]);
-
-//   OBJ.TotalDeposits = balance[0].totalBalance;
-
-//   /** 500000 is static change yo dynamic */
-  
-//   if (500000 < OBJ.TotalDeposits) {
-//     OBJ.LoanApproved = true;
-//     const TotalLoanAmount = ((500000 * randomNumber) / 100);
-    // const randomNumber = getRandomDecimal(9, 13);
-    // console.log(randomNumber.toFixed(2));
-//   }
-  
-// };
-
 exports.applyLoan = async (request, response) => {
 
   const getRandomDecimal = (min, max) => {
@@ -124,6 +86,71 @@ exports.existsLoan = async (request, response) => {
 
 };
 
-exports.approveLoan = async () => {
+exports.approveLoan = async (request, response) => {
+  const { id, amount, year, rate } = request.body;
   
+  await mongoose.connection.close();
+  const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
+  await checkConnection("CustomerFinancials_Database");
+
+  const balance = await CustomerFinancialasData.aggregate([
+    {
+      $group: {
+        _id: null,
+        totalBalance: { $sum: "$Balance" }
+      }
+    }
+  ]);
+
+  if (balance[0].Balance > amount) {
+    return response.status(402).send({ msg: "Bank not have enough funds avaliable right now" });
+  }
+
+  console.log(request.body);
+
+  const totalLoanAmount = amount;
+  const loanAmountAfterInterst = ((amount * rate) / 100); /** rate on loan amount */
+  const totalLoanAmountReceviedYears = loanAmountAfterInterst * year; /** rate amount * years */
+  const userPayAmount = totalLoanAmountReceviedYears + amount;
+
+  const forOneYear = (userPayAmount / 12);
+  const installment = (forOneYear / year);
+
+  console.log(loanAmountAfterInterst);
+  console.log(totalLoanAmountReceviedYears);
+  console.log(userPayAmount);
+  console.log(forOneYear);
+  console.log(installment);
+  console.log(amount);
+
+  const date = new Date();
+  
+  const formatDate = date.toISOString().substring(0, 10);
+  console.log(formatDate);
+
+  const processDate = new Date(formatDate);
+
+  const OBJ = {
+    StartingDate: formatDate,
+    EndingDate: (processDate.getFullYear() + 5) + "-" + formatDate.substring(5), 
+    Amount: amount,
+    loanAmountAfterInterst: loanAmountAfterInterst,
+    totalLoanAmountReceviedYears: totalLoanAmountReceviedYears,
+    userPayAmount: userPayAmount,
+    forOneYear: forOneYear,
+    installment: installment
+  };
+
+  console.log(OBJ);
+
+  await mongoose.connection.close();
+  const UserLoan = require("../model/LoanDB");
+  await checkConnection("Loan_Database");
+
+  console.log(id);
+
+  const data = await UserLoan.updateOne({ _id: id }, { $set: { Status: "Approved" }, $push: { LoanInfo: OBJ } }).catch((e) => console.log(e));
+  console.log(data);
+  
+  return response.status(200).send({ msg: "API testing", Date: OBJ });
 };

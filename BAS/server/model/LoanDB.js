@@ -93,12 +93,14 @@ const schema = new mongoose.Schema({
   LoanInfo: {
     type: [
       {
-        StartingDate: Date,
-        EndingDate: Date,
-        InstallmentAmount: Number,
-        AmountWithInterest: Number,
-        LoanAmount: Number,
-        LoanTimePeriod: Number
+        StartingDate: String,
+        EndingDate: String,
+        Amount: Number,
+        loanAmountAfterInterst: Number,
+        totalLoanAmountReceviedYears: Number,
+        userPayAmount: Number,
+        forOneYear: Number,
+        installment: Number
       }
     ],
     default: []
