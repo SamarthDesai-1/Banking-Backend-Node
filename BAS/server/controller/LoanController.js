@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 const checkConnection = require("../CheckConnections/CheckConnections");
 
 exports.applyLoan = async (request, response) => {
+  const { sessionEmail, formData } = request.body;
+
+  await mongoose.connection.close();
+  let LoanStatus = require("../model/LoanStatusDB");
+  await checkConnection("LoanStatus_Database");
+
+  await LoanStatus.deleteOne({ Email: sessionEmail });
 
   const getRandomDecimal = (min, max) => {
     return Math.random() * (max - min) + min;
@@ -12,7 +19,6 @@ exports.applyLoan = async (request, response) => {
 
   console.log(request.body);
 
-  const { sessionEmail, formData } = request.body;
 
   await mongoose.connection.close();
   const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
@@ -58,6 +64,18 @@ exports.applyLoan = async (request, response) => {
   /** save the use */
   await newUserLoan.save().then(data => console.log(data)).catch((e) => console.log(e));
 
+  await mongoose.connection.close();
+  LoanStatus = require("../model/LoanStatusDB");
+  await checkConnection("LoanStatus_Database");
+  
+  const newLoanStatus = new LoanStatus({
+    _id: secondDocumentId,
+    AccountNo: data[0].AccountNo,
+    Email: sessionEmail,
+  });
+
+  await newLoanStatus.save().then((data) => console.log(data)).catch((e) => console.log(e));
+
   return response.status(200).send({ msg: "API testing", Data: data });
 };
 
@@ -72,6 +90,12 @@ exports.rejectLoan = async (request, response) => {
 
   const data = await UserLoan.deleteOne({ _id: id });
   console.log(data);
+
+  await mongoose.connection.close();
+  const LoanStatus = require("../model/LoanStatusDB");
+  await checkConnection("LoanStatus_Database");
+
+  await LoanStatus.updateOne({ _id: id }, { $set: { Status: "Rejected" } });
 
   return response.status(200).send({ msg: "API testing" });
 };
@@ -151,6 +175,12 @@ exports.approveLoan = async (request, response) => {
 
   const data = await UserLoan.updateOne({ _id: id }, { $set: { Status: "Approved" }, $push: { LoanInfo: OBJ } }).catch((e) => console.log(e));
   console.log(data);
+
+  await mongoose.connection.close();
+  const LoanStatus = require("../model/LoanStatusDB");
+  await checkConnection("LoanStatus_Database");
+
+  await LoanStatus.updateOne({ _id: id }, { $set: { Status: "Approved" } });
   
   return response.status(200).send({ msg: "API testing", Date: OBJ });
 };
