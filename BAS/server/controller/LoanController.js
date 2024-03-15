@@ -102,11 +102,33 @@ exports.rejectLoan = async (request, response) => {
 
 exports.existsLoan = async (request, response) => {
 
+  let OBJ = {};
+
+  const { sessionEmail } = request.body;
   console.log(request.body);
 
   console.log("exists loan api call");
 
-  return response.status(200).send({ msg: "Ok" });
+  await mongoose.connection.close();
+  const LoanStatus = require("../model/LoanStatusDB");
+  await checkConnection("LoanStatus_Database");
+
+  const data = await LoanStatus.find({ Email: sessionEmail }, { Status: 1 });
+  console.log(data);
+
+  await mongoose.connection.close();
+  const UserLoan = require("../model/LoanDB");
+  await checkConnection("Loan_Database");
+  if (data.length != 0 && data[0].Status == "Approved") {
+    const data = await UserLoan.find({ Email: sessionEmail });
+    OBJ = data;
+  }
+  else if (data.length != 0 && data[0].Status == "Rejected") {
+    const data = await UserLoan.find({ Email: sessionEmail });
+    OBJ = data;
+  }
+
+  return response.status(200).send({ msg: "Ok", Data: data, OBJdata: OBJ });
 
 };
 

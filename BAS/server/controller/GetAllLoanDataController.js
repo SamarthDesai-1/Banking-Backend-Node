@@ -10,5 +10,11 @@ exports.getLoanData = async (request, response) => {
   const data = await UserLoan.find({});
   console.log(data);
 
-  return response.status(200).send({ msg: "Data get successfully", format: "Array of objet [{}]", Data: data });
+  await mongoose.connection.close();
+  let LoanStatus = require("../model/LoanStatusDB");
+  await checkConnection("LoanStatus_Database");
+  const statusData = await LoanStatus.find({}, { Status: 1 });
+  console.log(statusData);
+
+  return response.status(200).send({ msg: "Data get successfully", format: "Array of objet [{}]", Data: data, StatusData: statusData });
 };
