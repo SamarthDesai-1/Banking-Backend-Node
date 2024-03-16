@@ -48,6 +48,8 @@ app.use("/test/api/users", require("./routes/getChartData_route"));
 app.use("/test/api/users", require("./routes/loan_route"));
 app.use("/test/api/users", require("./routes/getLoan_route"));
 
+app.use("/test/api/users", require("./routes/payment_route"));
+
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);
 });

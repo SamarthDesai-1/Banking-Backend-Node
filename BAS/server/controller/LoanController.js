@@ -178,7 +178,7 @@ exports.approveLoan = async (request, response) => {
 
   const OBJ = {
     StartingDate: formatDate,
-    EndingDate: (processDate.getFullYear() + 5) + "-" + formatDate.substring(5), 
+    EndingDate: (processDate.getFullYear() + year) + "-" + formatDate.substring(5), 
     Amount: amount,
     loanAmountAfterInterst: loanAmountAfterInterst,
     totalLoanAmountReceviedYears: totalLoanAmountReceviedYears,
