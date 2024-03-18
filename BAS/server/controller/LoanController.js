@@ -228,7 +228,7 @@ exports.approveLoan = async (request, response) => {
       recevierAccountNo: "65d6c4999de62fa480c6c404",
       status: "success",
       statementStatus: "Cr",
-      msg: "Loan Transfer successfully"
+      msg: "Loan Recevied"
     };
     
     await AccountStatusSchema.updateOne(
