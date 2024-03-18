@@ -9,3 +9,4 @@ route.post("/approve-loan", controller.approveLoan);
 
 
 module.exports = route;
+

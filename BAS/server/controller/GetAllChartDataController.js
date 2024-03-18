@@ -168,6 +168,47 @@ exports.getServiceData = async (request, response) => {
   ratioOBJ.debitPercent = (OBJ.DebitCardUsers * 100) / OBJ.Users;
   ratioOBJ.FDusers = (OBJ.FDusers * 100) / OBJ.Users;
 
-  return response.status(200).send({ msg: "API testing", Data: ratioOBJ,  });
+  return response.status(200).send({ msg: "API testing", Data: ratioOBJ  });
 };
 
+
+exports.getBankAmount = async (request, response) => {
+
+  await mongoose.connection.close();
+  const AccountStatusSchema = require("../model/AccountStatusDB");
+  await checkConnection("AccountStatus_Database");
+
+  const bal = await AccountStatusSchema.aggregate([
+    {
+      $group: {
+        _id: null, 
+        totalBalance: { $sum: "$Balance" } 
+      }
+    }
+  ]);
+
+  const data = await AccountStatusSchema.aggregate([
+    { $unwind: "$TransactionHistory" },
+    {
+      $match: {
+        $or: [ 
+          { "TransactionHistory.statementStatus": "Cr" },
+          { "TransactionHistory.statementStatus": "Dr" }
+        ]
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        balance: { $first: bal[0].totalBalance },
+        creditAmount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Cr"] }, "$TransactionHistory.transferAmount", 0] } },
+        debitCount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Dr"] }, 1, 0] } },
+        debitAmount: { $sum: { $cond: [{ $eq: ["$TransactionHistory.statementStatus", "Dr"] }, "$TransactionHistory.transferAmount", 0] } }
+      }
+    }
+  ]);
+
+  console.log("Data bank amount : ", data);
+
+  return response.status(200).send({ msg: "API testing", Data: data[0].balance });
+};

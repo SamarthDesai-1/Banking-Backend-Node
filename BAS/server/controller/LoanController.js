@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const checkConnection = require("../CheckConnections/CheckConnections");
+const axios = require("axios");
 
 exports.applyLoan = async (request, response) => {
   const { sessionEmail, formData } = request.body;
@@ -203,6 +204,43 @@ exports.approveLoan = async (request, response) => {
   await checkConnection("LoanStatus_Database");
 
   await LoanStatus.updateOne({ _id: id }, { $set: { Status: "Approved" } });
+
+  /** transfer loan amount from bank account to customer account */
+  const bankAmount = await axios.post("http://localhost:5000/test/api/users/get-bank-amount").then(async (data) => {
+    console.log("Bank Amount : ", data.data.Data);
+
+    await mongoose.connection.close();
+    const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
+    await checkConnection("CustomerFinancials_Database");
+
+    const balance = await CustomerFinancialasData.find({ _id: id }, { Balance: 1 });
+    console.log(balance);
+    await CustomerFinancialasData.updateOne({ _id: id }, { $set: { Balance: balance[0].Balance + amount } });
+    
+    await mongoose.connection.close();
+    const AccountStatusSchema = require("../model/AccountStatusDB");
+    await checkConnection("AccountStatus_Database");
+    
+    const obj = {
+      date: new Date(),
+      transferAmount: amount,
+      senderAccountNo: "Loan Amount",
+      recevierAccountNo: "65d6c4999de62fa480c6c404",
+      status: "success",
+      statementStatus: "Cr",
+      msg: "Loan Transfer successfully"
+    };
+    
+    await AccountStatusSchema.updateOne(
+      { _id: id }, 
+      { 
+        $set: { Balance: balance[0].Balance + amount }, 
+        $push: { TransactionHistory: [obj] } 
+      }
+    );
+
+  });
+
   
   return response.status(200).send({ msg: "API testing", Date: OBJ });
 };
