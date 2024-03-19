@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const checkConnection = require("../CheckConnections/CheckConnections");
 const AccountCloseSchema = require("../model/CloseAccountDB");
 
+const OBJ = {
+  isUpdate: true
+};
+
 exports.getCloseRequest = async (request, response) => {
 
   await mongoose.connection.close();
@@ -58,12 +62,24 @@ exports.deleteAccount = async (request, response) => {
   }
   else {
     updateDATA = "reject";
+
+    /** Reject account close request */
+    await mongoose.connection.close();
+    const AccountCloseSchema = require("../model/CloseAccountDB");
+    await checkConnection("CloseAccount_Database");
+
+    const deletedData = await AccountCloseSchema.deleteOne({ AccountNo: id });
+    console.log(deletedData);
+
+    OBJ.isUpdate = false;
+    
   }
 
-  console.log(updateDATA);
-  const data = await AccountCloseSchema.updateOne({ AccountNo: id }, { $set: { Status: `${updateDATA}` } });
+  if (OBJ.isUpdate) {
+    console.log(updateDATA);
+    const data = await AccountCloseSchema.updateOne({ AccountNo: id }, { $set: { Status: `${updateDATA}` } });
+  }
 
-  
   if (updateDATA === "success") {
     
     await AccountCloseSchema.deleteOne({ AccountNo: id });

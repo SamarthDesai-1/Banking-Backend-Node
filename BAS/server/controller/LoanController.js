@@ -153,6 +153,18 @@ exports.approveLoan = async (request, response) => {
     return response.status(402).send({ msg: "Bank not have enough funds avaliable right now" });
   }
 
+  /** Approve loan only one time */
+  await mongoose.connection.close();
+  const UserLoan = require("../model/LoanDB");
+  await checkConnection("Loan_Database");
+
+  const isApprove = await UserLoan.find({ _id: id }, { LoanInfo: 1 });
+  console.log(isApprove[0].LoanInfo.length);
+
+  if (isApprove[0].LoanInfo.length == 1) {
+    return response.status(402).send({ msg: "Already loan is approved to customer" });
+  }
+
   console.log(request.body);
 
   const totalLoanAmount = amount;
@@ -189,10 +201,6 @@ exports.approveLoan = async (request, response) => {
   };
 
   console.log(OBJ);
-
-  await mongoose.connection.close();
-  const UserLoan = require("../model/LoanDB");
-  await checkConnection("Loan_Database");
 
   console.log(id);
 
