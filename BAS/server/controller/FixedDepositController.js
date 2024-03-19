@@ -3,7 +3,10 @@ const checkConnection = require("../CheckConnections/CheckConnections");
 
 const OBJ = {
   INTERESTRATE: "3",
-  minBalance: 1500
+  minBalance: 1500,
+  CustomerBalance: 0,
+  
+  NEWbalance: 0
 };
 
 
@@ -25,7 +28,7 @@ const generateStatement = async (FD, sessionEmail, Status) => {
     msg: `$${FD} has been ${Status === "Dr" ? "Debited" : "Credited" } to account for Fixed Deposit installment`
   };
   
-  await AccountStatusSchema.updateOne({ Email: sessionEmail }, { $set: { Balance: FD }, $push:{ TransactionHistory: [obj] } }, { new: true });
+  await AccountStatusSchema.updateOne({ Email: sessionEmail }, { $set: { Balance: OBJ.NEWbalance }, $push:{ TransactionHistory: [obj] } }, { new: true });
 };
 
 
@@ -34,6 +37,12 @@ const updateFunds = async (FD, sessionEmail) => {
   const CustomerFinancialasData = require("../model/CustomerFinancialsDB");
   Database = "CustomerFinancials_Database";
   await checkConnection(Database);
+
+  const data = await CustomerFinancialasData.find({ Email: sessionEmail }, { Balance: 1 });
+  console.log("Data : ", data);
+
+  console.log("Data[0].Balance : ", data[0].Balance);
+  console.log("FD : ", FD);
 
   await CustomerFinancialasData.updateOne({ Email: sessionEmail }, { $set: { Balance: FD } }, { new: true });
   await mongoose.connection.close();
@@ -84,8 +93,11 @@ exports.openFD = async (request, response) => {
       else {
         const FD = AccountBalance - amount;
 
+        OBJ.FDamount = amount;
+        OBJ.NEWbalance = FD;
+
         /** generate statement entry for Dr FD installment */
-        
+    
         await mongoose.connection.close();
         Database = "FixedDeposit_Database";
         const UserFD = require("../model/FixedDepositDB");

@@ -42,3 +42,4 @@ exports.getDebitData = async (request, response) => {
   return response.status(200).send({ Data: responseObject });
 };
 
+
