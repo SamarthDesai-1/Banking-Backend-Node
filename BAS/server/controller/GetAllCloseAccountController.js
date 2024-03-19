@@ -64,21 +64,21 @@ exports.deleteAccount = async (request, response) => {
     updateDATA = "reject";
 
     /** Reject account close request */
-    await mongoose.connection.close();
-    const AccountCloseSchema = require("../model/CloseAccountDB");
-    await checkConnection("CloseAccount_Database");
+    // await mongoose.connection.close();
+    // const AccountCloseSchema = require("../model/CloseAccountDB");
+    // await checkConnection("CloseAccount_Database");
 
-    const deletedData = await AccountCloseSchema.deleteOne({ AccountNo: id });
-    console.log(deletedData);
+    // const deletedData = await AccountCloseSchema.deleteOne({ AccountNo: id });
+    // console.log(deletedData);
 
-    OBJ.isUpdate = false;
+    // OBJ.isUpdate = false;
     
   }
 
-  if (OBJ.isUpdate) {
+  // if (OBJ.isUpdate) {
     console.log(updateDATA);
     const data = await AccountCloseSchema.updateOne({ AccountNo: id }, { $set: { Status: `${updateDATA}` } });
-  }
+  // }
 
   if (updateDATA === "success") {
     
