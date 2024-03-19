@@ -180,6 +180,37 @@ exports.deleteAccount = async (request, response) => {
       }
     };
     await tokenDB(id);
+    
+    const loanStatus = async (id) => {
+      await mongoose.connection.close();
+      const LoanStatus = require("../model/LoanStatusDB");
+      await checkConnection("LoanStatus_Database");
+      
+      const user = await LoanStatus.findOne({ AccountNo: id });
+      
+      if (user) {
+        await LoanStatus.deleteOne({ AccountNo: id });
+      }
+      else {
+        console.log("Data not found");
+      }
+    };
+    await loanStatus(id);
+
+    const loanDatabase = async (id) => {
+      await mongoose.connection.close();
+      const UserLoan = require("../model/LoanDB");
+      await checkConnection("Loan_Database");
+
+      const user = await UserLoan.findOne({ AccountNo: id });
+      if (user) {
+        await UserLoan.deleteOne({ AccountNo: id });
+      }
+      else {
+        console.log("Data not found");
+      }
+    };
+    await loanDatabase(id);
 
 
     return response.status(200).send({ msg: "Admin user has been deleted from the database" });
