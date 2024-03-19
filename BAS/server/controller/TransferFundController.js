@@ -102,7 +102,7 @@ exports.transferFund = async (request, response) => {
         console.log("Sender : ", Confirmation.senderBalance + " " + "Recevier : " +  Confirmation.recevierBalance + " " + amount);
   
         if (Confirmation.senderBalance < amount) { /** if not have enough funds in acoount to carry transaction */
-          return response.status(402).send({ msg: "Inappropriate bank balance for payment", status: false });
+          return response.status(402).send({ msg: "Insufficient bank balance for payment and maintain balance of 1500", status: false });
         }
         else if (amount < 0) {
           return response.status(402).send({ msg: "Invalid mathematical expression amount not should be in negative", status: false });
