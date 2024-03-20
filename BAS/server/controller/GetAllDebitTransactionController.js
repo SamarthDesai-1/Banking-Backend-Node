@@ -28,7 +28,7 @@ exports.getDebitData = async (request, response) => {
   console.log(OBJ);
 
   
-  const balance = await AccountStatusSchema.find({ Email: sessionEmail }, { Balance: 1 });
+  const balance = await AccountStatusSchema.find({ Email: sessionEmail }, { Balance: 1, TransactionHistory: 1 });
   console.log("Balance : ", balance);
   
   const responseObject = {
@@ -36,6 +36,7 @@ exports.getDebitData = async (request, response) => {
     format: "Array of objects [{}]",
     Balance: balance[0].Balance,
     Cr: data.length > 0 ? data[0].totalAmount : 0,
+    TransactionHistory: balance[0].TransactionHistory
   };
   console.log(responseObject);
 

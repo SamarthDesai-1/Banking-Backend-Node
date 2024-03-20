@@ -18,8 +18,8 @@ const SendMail = async (email, response, token, OTP) => {
 
   const mailOptions = {
     from: "transactorgltd@gmail.com",
-    // to: `${email}`,
-    to: "samarthdesain@gmail.com",
+    to: `${email}`,
+    // to: "samarthdesain@gmail.com",
     subject: "Hello from Transact LTD",
     text: `Dear User,\n\nYou have requested to reset your password for your account with us. To proceed with the password reset process, please use the following OTP (One-Time Password) within the next 10 minutes:\n\nOTP: ${OTP}\n\nIf you did not initiate this password reset request, please disregard this email. Your account security may have been compromised, and we recommend contacting our support team immediately.\n\nThank you for using our service.\n\nBest regards,\nTransact Payments`,
   };
