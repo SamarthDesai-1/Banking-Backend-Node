@@ -49,6 +49,7 @@ app.use("/test/api/users", require("./routes/loan_route"));
 app.use("/test/api/users", require("./routes/getLoan_route"));
 
 app.use("/test/api/users", require("./routes/cardpayment_route"));
+app.use("/test/api/users", require("./routes/blockcard_route"));
 
 app.listen(PORT, () => {
   console.log(`App listenning at ${PORT}`);
