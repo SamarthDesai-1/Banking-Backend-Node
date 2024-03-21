@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@stripe/stripe-js": "^3.0.10",
     "axios": "^1.6.8",
     "body-parser": "^1.20.2",
     "crypto-js": "^4.2.0",
