@@ -52,5 +52,5 @@ app.use("/test/api/users", require("./routes/cardpayment_route"));
 app.use("/test/api/users", require("./routes/blockcard_route"));
 
 app.listen(PORT, () => {
-  console.log(`App listenning at ${PORT}`);
+  console.log(`Server listenning at ${PORT}`);
 });

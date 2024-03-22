@@ -3,7 +3,13 @@ const checkConnection = require("../CheckConnections/CheckConnections");
 
 exports.closeAccount = async (request, response) => {
 
+
   const { formData, sessionEmail, accountNo, userID } = request.body;
+
+  await mongoose.connection.close();
+  const CloseAccountStatus = require("../model/CloseAccountStatusDB");
+  await checkConnection("CLoseAccountStatus");
+  await CloseAccountStatus.deleteOne({ AccountNo: accountNo });
 
   console.log(typeof accountNo);
   console.log(typeof formData.AccountNo);
@@ -28,12 +34,29 @@ exports.closeAccount = async (request, response) => {
       AccountNo: formData.AccountNo,
     });
 
-    await newRequest.save().then((data) => {
-      console.log(data);
-      return response.status(200).send({ msg: "API testing", statusProcess: true });
-    }).catch((e) => {
-      return response.status(402).send({ msg: e })
+    // await newRequest.save().then((data) => {
+    //   console.log(data);
+    //   return response.status(200).send({ msg: "API testing", statusProcess: true });
+    // }).catch((e) => {
+    //   return response.status(402).send({ msg: e })
+    // });
+
+    /** Save user */
+    await newRequest.save().then(data => console.log(data)).catch(e => console.log(e));
+
+    await mongoose.connection.close();
+    const CloseAccountStatus = require("../model/CloseAccountStatusDB");
+    await checkConnection("CLoseAccountStatus");
+    
+    const statusRequest = new CloseAccountStatus({
+      _id: secondDocumentId,
+      AccountNo: formData.AccountNo,
+      Email: sessionEmail
     });
+
+    await statusRequest.save().then(data => console.log(data)).catch((e) => console.log(e));
+
+    return response.status(200).send({ msg: "Close account application submitted successfully", statusProcess: true });
 
   }
   else {
@@ -42,3 +65,9 @@ exports.closeAccount = async (request, response) => {
 
 
 }; 
+
+
+exports.closeAccountReject = async (request, response) => {
+
+  
+};

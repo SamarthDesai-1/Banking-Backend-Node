@@ -25,10 +25,10 @@ exports.getClosed = async (request, response) => {
   const { sessionEmail } = request.body;
 
   await mongoose.connection.close();
-  let Database = "CloseAccount_Database";
-  await checkConnection(Database);
+  const CloseAccountStatus = require("../model/CloseAccountStatusDB");
+  await checkConnection("CLoseAccountStatus");
 
-  const data = await AccountCloseSchema.find({ Email: sessionEmail }, { Status: 1 });
+  const data = await CloseAccountStatus.find({ Email: sessionEmail }, { Status: 1 });
   console.log(data);
   console.log("Data length : ", data.length);
 
@@ -38,14 +38,15 @@ exports.getClosed = async (request, response) => {
 
       return response.status(200).send({ msg: "Your request has been pending", Data: data});
     }
-    else if (data[0].Status === "reject") {
+    else if (data[0].Status === "reject") { /** this condition never hits */
       return response.status(200).send({ msg: "Your request has been reject", Data: data});
     }
   }
 
-  return response.status(402).send({ msg: "first fill the form to close account then after check status" });
+  return response.status(402).send({ msg: "First fill the form to close account then after check status." });
   
 };
+
 
 
 exports.deleteAccount = async (request, response) => {
@@ -64,21 +65,22 @@ exports.deleteAccount = async (request, response) => {
     updateDATA = "reject";
 
     /** Reject account close request */
-    // await mongoose.connection.close();
-    // const AccountCloseSchema = require("../model/CloseAccountDB");
-    // await checkConnection("CloseAccount_Database");
+    await mongoose.connection.close();
+    const AccountCloseSchema = require("../model/CloseAccountDB");
+    await checkConnection("CloseAccount_Database");
 
-    // const deletedData = await AccountCloseSchema.deleteOne({ AccountNo: id });
-    // console.log(deletedData);
+    const deletedData = await AccountCloseSchema.deleteOne({ AccountNo: id });
+    console.log(deletedData);
 
-    // OBJ.isUpdate = false;
-    
+    console.log(updateDATA);
+  
+    await mongoose.connection.close();
+    const CloseAccountStatus = require("../model/CloseAccountStatusDB");
+    await checkConnection("CLoseAccountStatus");
+  
+    await CloseAccountStatus.updateOne({ AccountNo: id }, { $set: { Status: `${updateDATA}` } }, { new: true });
   }
 
-  // if (OBJ.isUpdate) {
-    console.log(updateDATA);
-    const data = await AccountCloseSchema.updateOne({ AccountNo: id }, { $set: { Status: `${updateDATA}` } });
-  // }
 
   if (updateDATA === "success") {
     
@@ -211,6 +213,51 @@ exports.deleteAccount = async (request, response) => {
       }
     };
     await loanDatabase(id);
+
+
+
+
+
+
+
+
+
+    const closeAccountStatus = async (id) => {
+      await mongoose.connection.close();
+      const CloseAccountStatus = require("../model/CloseAccountStatusDB");
+      await checkConnection("CLoseAccountStatus");
+
+      const user = await CloseAccountStatus.findOne({ AccountNo: id });
+      if (user) {
+        await CloseAccountStatus.deleteOne({ AccountNo: id });
+      }
+      else {
+        console.log("Data not found");
+      }
+    };
+    await closeAccountStatus(id);
+
+    // const closeAccountRequest = async (id) => {
+    //   await mongoose.connection.close();
+    //   const AccountCloseSchema = require("../model/CloseAccountDB");
+    //   await checkConnection("CloseAccount_Database");
+
+    //   const user = await AccountCloseSchema.findOne({ AccountNo: id });
+    //   if (user) {
+    //     await AccountCloseSchema.deleteOne({ AccountNo: id });
+    //   }
+    //   else {
+    //     console.log("Data not found");
+    //   }
+    // };
+    // await closeAccountRequest(id);
+
+
+
+
+
+
+
 
 
     return response.status(200).send({ msg: "Admin user has been deleted from the database" });
