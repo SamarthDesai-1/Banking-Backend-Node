@@ -149,6 +149,9 @@ exports.fetchCustomerData = async (request, response) => {
 
 exports.updateCustomerData = async (request, response) => {
   
+
+  console.log(request);
+
   await mongoose.connection.close();
   const UserAccountOpenSchema = require("../model/AccountOpenDB");
   Database = "AccountOpen_Database";
@@ -158,28 +161,30 @@ exports.updateCustomerData = async (request, response) => {
   console.log("Request Body update account data : ", request.body);
   console.log(".................................................");
 
-  console.log("FirstName : ", request.body.data.FirstName);
-  console.log("LastName : ", request.body.data.LastName);
-  console.log("DOB : ", request.body.data.DOB);
-  console.log("MonthlyIncome : ", typeof request.body.data.MonthlyIncome);
+  console.log("FirstName : ", request.body.FirstName);
+  console.log("LastName : ", request.body.LastName);
+  console.log("DOB : ", request.body.DOB);
+  console.log("MonthlyIncome : ", typeof request.body.MonthlyIncome);
 
-  let income = Number.parseInt(request.body.data.MonthlyIncome);
+  let income = Number.parseInt(request.body.MonthlyIncome);
   console.log(income, "  ", typeof income);
 
-  console.log("Data : ", request.body.data);
+  const image = request.file.path;
+  console.log("File : ", image);
 
   /** update in account open schema */
-  await UserAccountOpenSchema.updateOne({ Email: request.body.sessionEmail }, { $set: { 
-    FirstName: request.body.data.FirstName,
-    LastName: request.body.data.LastName,
-    Address: request.body.data.Address,
-    DOB: request.body.data.DOB,
-    Mobile: request.body.data.Mobile,
-    MonthlyIncome: request.body.data.MonthlyIncome,
-    AadharCard: request.body.data.AadharCard,
-    Nominee: request.body.data.Nominee,
-    NomineeAadharCard: request.body.data.NomineeAadharCard,
-    PanCard: request.body.data.PanCard,
+  await UserAccountOpenSchema.updateOne({ Email: request.body.Email }, { $set: { 
+    FirstName: request.body.FirstName,
+    LastName: request.body.LastName,
+    Photo: image,
+    Address: request.body.Address,
+    DOB: request.body.DOB,
+    Mobile: request.body.Mobile,
+    MonthlyIncome: request.body.MonthlyIncome,
+    AadharCard: request.body.AadharCard,
+    Nominee: request.body.Nominee,
+    NomineeAadharCard: request.body.NomineeAadharCard,
+    PanCard: request.body.PanCard,
 
   } }, { new: true });
   await mongoose.connection.close();
@@ -190,17 +195,18 @@ exports.updateCustomerData = async (request, response) => {
   Database = "CustomerFinancials_Database";
   await checkConnection(Database);
 
-  await CustomerFinancialasData.updateOne({ Email: request.body.sessionEmail }, { $set: { 
-    FirstName: request.body.data.FirstName,
-    LastName: request.body.data.LastName,
-    Address: request.body.data.Address,
-    DOB: request.body.data.DOB,
-    Mobile: request.body.data.Mobile,
-    MonthlyIncome: request.body.data.MonthlyIncome,
-    AadharCard: request.body.data.AadharCard,
-    Nominee: request.body.data.Nominee,
-    NomineeAadharCard: request.body.data.NomineeAadharCard,
-    PanCard: request.body.data.PanCard,  
+  await CustomerFinancialasData.updateOne({ Email: request.body.Email }, { $set: { 
+    FirstName: request.body.FirstName,
+    LastName: request.body.LastName,
+    Address: request.body.Address,
+    DOB: request.body.DOB,
+    Mobile: request.body.Mobile,
+    MonthlyIncome: request.body.MonthlyIncome,
+    AadharCard: request.body.AadharCard,
+    Nominee: request.body.Nominee,
+    NomineeAadharCard: request.body.NomineeAadharCard,
+    PanCard: request.body.PanCard,  
+    Photo: image
 
   } }, { new: true });
   await mongoose.connection.close();
